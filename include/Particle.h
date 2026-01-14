@@ -12,6 +12,10 @@ class Particle{
         double mass;
         double radius;
     public:
+        Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, double mass, double radius);
+
+        // Getters:
+
 };
 
 
