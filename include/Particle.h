@@ -5,16 +5,22 @@
 
 class Particle{
     private:
+        double mass;
+        double radius;
+    protected:
         Vector3 position;
         Vector3 velocity;   
         Vector3 acceleration;
-
-        double mass;
-        double radius;
     public:
         Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, double mass, double radius);
 
         // Getters:
+        double getMass();
+        double getRadius();
+        Vector3 getPosition();
+        Vector3 getVelocity();
+        Vector3 getAcceleration();
+
 
 };
 

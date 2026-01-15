@@ -8,3 +8,24 @@ Particle::Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, dou
     this->mass = mass;
     this->radius = radius;
 }
+
+
+double Particle::getMass(){
+    return this->mass;
+}
+
+double getRadius(){
+    return this->radius;
+}
+
+Vector3 getPosition(){
+    return this->position;
+}
+
+Vector3 getVelocity(){
+    return this->velocity;
+}
+
+Vector3 getAcceleration(){
+    return this->acceleration;
+}

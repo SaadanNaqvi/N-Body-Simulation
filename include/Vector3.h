@@ -9,6 +9,15 @@ class Vector3{
     public:
         Vector3(double x, double y, double z);
         
+        // Getters
+        double getX();
+        double getY();
+        double getZ();
+
+        // Setters
+        void setX(double x);
+        void setY(double y);
+        void setZ(double z);
 };
 
 

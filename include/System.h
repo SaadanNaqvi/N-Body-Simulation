@@ -2,10 +2,11 @@
 #define SYSTEM_H
 
 #include "Particle.h"
+#include "GravityForce.h"
 
 class System{
     private:
-        vector<Particle*> particles;
+        std::vector<Particle*> particles;
     public:
 };
 
