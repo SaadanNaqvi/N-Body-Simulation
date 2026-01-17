@@ -12,8 +12,9 @@ class Renderer{
         int height;
         Vector3* camera;
     public:
-        Renderer(int width, int height, Vector3* camera);
+        Renderer(int width, int height);
         void run();
+        void processInput(GLFWwindow* window);
         void drawSphere();
 };
 

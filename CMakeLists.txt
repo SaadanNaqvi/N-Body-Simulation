@@ -5,7 +5,6 @@ project(NBodySimulation LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Silence OpenGL deprecation warnings
 add_compile_definitions(GL_SILENCE_DEPRECATION)
 
 # Include paths
@@ -14,25 +13,36 @@ include_directories(
     dependencies/include
 )
 
-# Source files
-file(GLOB_RECURSE CPP_SOURCES src/*.cpp)
 set(GLAD_SRC dependencies/src/glad.c)
 
-# Create executable
-add_executable(myprogram
+# Absolute path to GLFW
+set(GLFW_LIB "${CMAKE_SOURCE_DIR}/dependencies/library/libglfw.3.4.dylib")
+
+file(GLOB_RECURSE CPP_SOURCES src/*.cpp)
+
+add_executable(simulation
     ${CPP_SOURCES}
     ${GLAD_SRC}
 )
 
-# GLFW library path
-target_link_directories(myprogram PRIVATE dependencies/library)
-
-# Link GLFW + macOS frameworks
-target_link_libraries(myprogram
-    glfw
+target_link_libraries(simulation
+    ${GLFW_LIB}
     "-framework OpenGL"
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
 )
 
+add_executable(renderTest
+    src/run/Renderer.cpp
+    src/testing/runTesting.cpp
+    ${GLAD_SRC}
+)
+
+target_link_libraries(renderTest
+    ${GLFW_LIB}
+    "-framework OpenGL"
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework CoreVideo"
+)

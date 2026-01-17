@@ -12,7 +12,7 @@ class Particle{
         Vector3* velocity;   
         Vector3* acceleration;
     public:
-        Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, double mass, double radius);
+        Particle(Vector3* position, Vector3* velocity, Vector3* acceleration, double mass, double radius);
 
         // Getters:
         double getMass();

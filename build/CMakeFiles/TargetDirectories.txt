@@ -1,3 +1,4 @@
-/Users/saadannaqvi/Documents/Programming/N-Body-Simulation/build/CMakeFiles/myprogram.dir
+/Users/saadannaqvi/Documents/Programming/N-Body-Simulation/build/CMakeFiles/simulation.dir
+/Users/saadannaqvi/Documents/Programming/N-Body-Simulation/build/CMakeFiles/renderTest.dir
 /Users/saadannaqvi/Documents/Programming/N-Body-Simulation/build/CMakeFiles/edit_cache.dir
 /Users/saadannaqvi/Documents/Programming/N-Body-Simulation/build/CMakeFiles/rebuild_cache.dir
