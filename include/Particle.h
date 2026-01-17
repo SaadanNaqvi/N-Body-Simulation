@@ -8,18 +8,18 @@ class Particle{
         double mass;
         double radius;
     protected:
-        Vector3 position;
-        Vector3 velocity;   
-        Vector3 acceleration;
+        Vector3* position;
+        Vector3* velocity;   
+        Vector3* acceleration;
     public:
         Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, double mass, double radius);
 
         // Getters:
         double getMass();
         double getRadius();
-        Vector3 getPosition();
-        Vector3 getVelocity();
-        Vector3 getAcceleration();
+        Vector3* getPosition();
+        Vector3* getVelocity();
+        Vector3* getAcceleration();
 
 
 };

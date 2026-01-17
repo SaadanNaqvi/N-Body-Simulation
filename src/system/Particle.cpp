@@ -1,6 +1,6 @@
 #include "Particle.h"
 
-Particle::Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, double mass, double radius){
+Particle::Particle(Vector* position, Vector3* velocity, Vector3* acceleration, double mass, double radius){
     this->position = position;
     this->velocity = velocity;   
     this->acceleration = acceleration;
@@ -18,14 +18,14 @@ double getRadius(){
     return this->radius;
 }
 
-Vector3 getPosition(){
+Vector3* getPosition(){
     return this->position;
 }
 
-Vector3 getVelocity(){
+Vector3* getVelocity(){
     return this->velocity;
 }
 
-Vector3 getAcceleration(){
+Vector3* getAcceleration(){
     return this->acceleration;
 }
