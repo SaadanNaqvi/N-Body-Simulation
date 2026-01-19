@@ -3,14 +3,15 @@
 
 #include "Vector3.h"
 #include "Particle.h"
-#include <map>
+#include <unordered_map>
+#include <vector>
 #include <utility>
 
 class ForceModel{
     private:
     public:
-        virtual double getForce(Particle* particle1, Particle* particle2) = 0;
-        virtual std::map<std::pair<Particle*, Particle*>, double> getSystemForce(std::vector<Particle*>) = 0;
+        virtual Vector3 getForce(Particle* particle1, Particle* particle2) = 0;
+        virtual std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> getSystemForce(std::vector<Particle*>& systemParticles) = 0;
 };
 
 

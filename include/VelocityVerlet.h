@@ -8,6 +8,7 @@
 class VelocityVerlet: public Integrator{
     private:
     public:
+        void stepSimulation(double dt, System system) override;
 };
 
 #endif

@@ -14,12 +14,21 @@ class Particle{
     public:
         Particle(Vector3* position, Vector3* velocity, Vector3* acceleration, double mass, double radius);
 
+        void forceApplied(double force);
+
         // Getters:
         double getMass();
         double getRadius();
         Vector3* getPosition();
         Vector3* getVelocity();
         Vector3* getAcceleration();
+
+        // Setters:
+        void setPosition(Vector3* position);
+        void setVelocity(Vector3* velocity);
+        void setAcceleration(Vector3* acceleration);
+
+
 
 
 };
