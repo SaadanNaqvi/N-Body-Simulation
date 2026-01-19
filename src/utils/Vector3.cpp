@@ -12,31 +12,29 @@ Vector3::Vector3(double x, double y, double z){
     this->z = z;
 }
 
-double Vector3::getX(){
+double Vector3::getX() const{
     return x;
 }
 
-double Vector3::getY(){
+double Vector3::getY() const{
     return y;
 }
 
-double Vector3::getZ(){
+double Vector3::getZ() const{
     return z;
 }
 
-
 Vector3 Vector3::operator+(const Vector3& other) const {
-    return Vector3(this->x + other.x, this->y + other.y, this->z + other.z);
+    return Vector3(x + other.x, y + other.y, z + other.z);
 }
 
 Vector3 Vector3::operator*(double scalar) const {
-    return Vector3(this->x * scalar, this->y * scalar, this->z * scalar);
+    return Vector3(x * scalar, y * scalar, z * scalar);
 }
 
 Vector3 Vector3::operator/(double scalar) const {
-    return Vector3(this->x / scalar, this->y / scalar, this->z / scalar);
+    return Vector3(x / scalar, y / scalar, z / scalar);
 }
-
 
 Vector3& Vector3::operator+=(const Vector3& other) {
     x += other.x; y += other.y; z += other.z;
@@ -47,3 +45,4 @@ Vector3& Vector3::operator*=(double scalar) {
     x *= scalar; y *= scalar; z *= scalar;
     return *this;
 }
+

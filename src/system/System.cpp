@@ -5,10 +5,12 @@ System::System(){}
 
 System::System(std::vector<Particle*> particles){
     this->particles = particles;
+    velocityVerlet = new VelocityVerlet();
 }
 
 void System::addParticle(Particle* particle){
     this->particles.push_back(particle);
+    velocityVerlet = new VelocityVerlet();
 }
 
 std::unordered_map<Particle*, Vector3> System::getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce){
@@ -24,10 +26,10 @@ std::unordered_map<Particle*, Vector3> System::getForceOnEachParticle(std::unord
     return netForceOnParticles;
 }
 
-void System::update(double dt = 1.0){
+void System::update(double dt){
     this->systemForce = gravityForce.getSystemForce(this->particles);
     this->netForceOnParticles = getForceOnEachParticle(this->systemForce);
-    velocityVerlet.stepSimulation(dt, *this);
+    velocityVerlet->stepSimulation(dt, *this);
 }
 
 
@@ -54,4 +56,8 @@ GravityForce& System::getGravityForce(){
 
 void System::setSystemForce(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> systemForce){
     this->systemForce = systemForce;
+}
+
+System::~System() {
+    delete velocityVerlet;
 }

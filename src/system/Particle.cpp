@@ -9,10 +9,6 @@ Particle::Particle(Vector3* position, Vector3* velocity, Vector3* acceleration, 
     this->radius = radius;
 }
 
-void Particle::forceApplied(double force){
-    
-}
-
 
 double Particle::getMass(){
     return mass;

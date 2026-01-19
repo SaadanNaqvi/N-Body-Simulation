@@ -20,6 +20,7 @@ set(GLFW_LIB "${CMAKE_SOURCE_DIR}/dependencies/library/libglfw.3.4.dylib")
 
 file(GLOB_RECURSE CPP_SOURCES src/*.cpp)
 
+
 add_executable(simulation
     ${CPP_SOURCES}
     ${GLAD_SRC}
@@ -33,20 +34,23 @@ target_link_libraries(simulation
     "-framework CoreVideo"
 )
 
-add_executable(renderTest
-    src/graphics/Renderer.cpp
-    src/graphics/Shader.cpp
-    src/graphics/Camera.cpp
+
+add_executable(systemTest
     src/utils/Vector3.cpp
-    src/testing/graphicTesting.cpp
+    src/testing/systemTesting.cpp
+    src/system/Particle.cpp
+    src/system/System.cpp
+    src/physics/GravityForce.cpp
+    src/physics/VelocityVerlet.cpp
     ${GLAD_SRC}
 )
 
-target_link_libraries(renderTest
+target_link_libraries(systemTest
     ${GLFW_LIB}
     "-framework OpenGL"
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
 )
+
 

@@ -14,8 +14,6 @@ class Particle{
     public:
         Particle(Vector3* position, Vector3* velocity, Vector3* acceleration, double mass, double radius);
 
-        void forceApplied(double force);
-
         // Getters:
         double getMass();
         double getRadius();

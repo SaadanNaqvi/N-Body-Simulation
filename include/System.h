@@ -3,7 +3,10 @@
 
 #include "Particle.h"
 #include "GravityForce.h"
+#include <vector>
 #include "VelocityVerlet.h"
+
+class VelocityVerlet;
 
 class System{
     private:
@@ -13,7 +16,7 @@ class System{
 
 
         GravityForce gravityForce;
-        VelocityVerlet velocityVerlet;
+        VelocityVerlet* velocityVerlet;
         
     public:
         System();
@@ -23,16 +26,18 @@ class System{
 
 
 
-        void update()
-        std::vector<std::pair<Particle*, Vector3>> getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce);
+        void update(double dt = 1.0);
+        std::unordered_map<Particle*, Vector3> getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce);
 
-        vector<Particle*>& getParticles();
+        std::vector<Particle*>& getParticles();
         std::unordered_map<Particle*, Vector3>& getNetForceOnParticles();
         std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> getSystemForce();
         GravityForce& getGravityForce();
 
 
         void setSystemForce(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> systemForce);
+
+        ~System();
 
 };  
 

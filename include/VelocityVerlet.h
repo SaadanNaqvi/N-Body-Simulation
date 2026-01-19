@@ -5,6 +5,8 @@
 
 #include "Integrator.h"
 
+class System;
+
 class VelocityVerlet: public Integrator{
     private:
     public:
