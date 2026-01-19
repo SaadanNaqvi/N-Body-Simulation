@@ -34,7 +34,10 @@ target_link_libraries(simulation
 )
 
 add_executable(renderTest
-    src/run/Renderer.cpp
+    src/graphics/Renderer.cpp
+    src/graphics/Shader.cpp
+    src/graphics/Camera.cpp
+    src/utils/Vector3.cpp
     src/testing/runTesting.cpp
     ${GLAD_SRC}
 )
@@ -46,3 +49,4 @@ target_link_libraries(renderTest
     "-framework IOKit"
     "-framework CoreVideo"
 )
+

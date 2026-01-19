@@ -2,6 +2,8 @@
 #define RENDERER_H
 
 #include "System.h"
+#include "Shader.h"
+#include "Camera.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -23,7 +25,7 @@ class Renderer{
     public:
         Renderer(int width, int height);
         void run();
-        void processInput(GLFWwindow* window);
+        void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
         void generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices);
         void initSphere();
         void drawSphere();
