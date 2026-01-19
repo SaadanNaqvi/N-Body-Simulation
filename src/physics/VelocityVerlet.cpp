@@ -1,10 +1,10 @@
 #include "VelocityVerlet.h"
 
-void VelocityVerlet::stepSimulation(double dt, System system) {
+void VelocityVerlet::stepSimulation(double dt, System& system) {
     
     auto& particles = system.getParticles();            
-    auto netForceOnParticles = system.getNetForceOnParticles();       
-    auto gravityForce = system.getGravityForce();             
+    auto& netForceOnParticles = system.getNetForceOnParticles();       
+    auto& gravityForce = system.getGravityForce();             
 
     for(auto& particle : particles){
         Vector3 acceleration = netForceOnParticles[particle] / particle->getMass();

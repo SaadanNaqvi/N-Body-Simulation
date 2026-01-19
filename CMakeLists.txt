@@ -38,7 +38,7 @@ add_executable(renderTest
     src/graphics/Shader.cpp
     src/graphics/Camera.cpp
     src/utils/Vector3.cpp
-    src/testing/runTesting.cpp
+    src/testing/graphicTesting.cpp
     ${GLAD_SRC}
 )
 

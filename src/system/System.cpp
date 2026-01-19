@@ -8,43 +8,43 @@ System::System(std::vector<Particle*> particles){
 }
 
 void System::addParticle(Particle* particle){
-    this->particles.push_back(particle*);
+    this->particles.push_back(particle);
 }
 
 std::unordered_map<Particle*, Vector3> System::getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce){
     std::unordered_map<Particle*, Vector3> netForceOnParticles;
     for(auto& [particle, connections]: systemForce){
-        Vector3 netForce(0.0, 0.0, 0.0);
+        Vector3 netForce;
         for(auto& [neighbour, force]: connections){
             netForce += force;
         }
-        netForceOnParticles.push_back({particle, netForce});
+        netForceOnParticles[particle] = netForce;
     }
 
     return netForceOnParticles;
 }
 
-void System::update(){
+void System::update(double dt = 1.0){
     this->systemForce = gravityForce.getSystemForce(this->particles);
     this->netForceOnParticles = getForceOnEachParticle(this->systemForce);
-    velocityVerlet.stepSimulation(1.0, gravityForce, systemForce, netForceOnParticles, particles);
+    velocityVerlet.stepSimulation(dt, *this);
 }
 
 
 
-vector<Particle*> System::getParticles(){
+std::vector<Particle*>& System::getParticles(){
     return this->particles;
 }
 
-std::unordered_map<Particle*, Vector3> System::getNetForceOnParticles(){
-    return thuis->netForceOnParticles;
+std::unordered_map<Particle*, Vector3>& System::getNetForceOnParticles(){
+    return this->netForceOnParticles;
 }
 
 std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> System::getSystemForce(){
     return this->systemForce;
 }
 
-GravityForce System::getGravityForce(){
+GravityForce& System::getGravityForce(){
     return this->gravityForce;
 }
 
