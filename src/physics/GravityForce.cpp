@@ -6,11 +6,12 @@ Vector3 GravityForce::getForce(Particle* particle1, Particle* particle2){
     double dz = particle2->getPosition()->getZ() - particle1->getPosition()->getZ();
 
     double distance = (dx * dx) + (dy * dy) + (dz * dz);
+    double r = sqrt(distance);
     double force = (G * particle1->getMass() * particle2->getMass()) / distance;
 
-    double fx = force * dx / distance;
-    double fy = force * dy / distance;
-    double fz = force * dz / distance;
+    double fx = force * dx / r;
+    double fy = force * dy / r;
+    double fz = force * dz / r;
 
     Vector3 forces(fx,fy,fz);
 

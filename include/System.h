@@ -26,7 +26,7 @@ class System{
 
 
 
-        void update(double dt = 1.0);
+        void update(double dt);
         std::unordered_map<Particle*, Vector3> getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce);
 
         std::vector<Particle*>& getParticles();
