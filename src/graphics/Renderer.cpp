@@ -1,8 +1,4 @@
 #include "Renderer.h"
-#include "Camera.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
 float lastX = 400, lastY = 300;
@@ -45,7 +41,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
         globalCamera->processMouseScroll(yoffset);
 }
 
-void Renderer::run(){
+void Renderer::run(System& system){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -123,11 +119,11 @@ void Renderer::run(){
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix((float)width / (float)height);
         
-        shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
         
-        drawSphere();
+        drawSphere(system.getParticles(), shader);
+        system.update(3600.0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -221,8 +217,22 @@ void Renderer::initSphere(){
     glBindVertexArray(0);
 }
 
-void Renderer::drawSphere() {
+void Renderer::drawSphere(std::vector<Particle*>& particles, Shader& shader) {
     glBindVertexArray(sphereVAO);
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    for(auto& particle:particles){
+        Vector3* position = particle->getPosition();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(
+            model, 
+            glm::vec3{
+                position->getX() * visualScale,
+                position->getY() * visualScale,
+                position->getZ() * visualScale
+            }
+        );
+        shader.setMat4("model", model);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    }
+    
     glBindVertexArray(0);
 }

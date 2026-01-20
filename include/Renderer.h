@@ -7,6 +7,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Renderer{
     private:
@@ -21,14 +24,15 @@ class Renderer{
         unsigned int sphereEBO = 0;
         unsigned int indexCount = 0;
 
+        const float visualScale = 1e-9f;
 
     public:
         Renderer(int width, int height);
-        void run();
+        void run(System& system);
         void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
         void generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices);
         void initSphere();
-        void drawSphere();
+        void drawSphere(std::vector<Particle*>& particle, Shader& shader);
 };
 
 #endif

@@ -1,3 +1,4 @@
+/* 
 #include <iostream>
 #include "System.h"
 using namespace std;
@@ -23,7 +24,8 @@ int main(){
             Vector3* pos = p->getPosition();
             std::cout << "Particle at (" << pos->getX() << ", " << pos->getY() << ", " << pos->getZ() << ")\n";
         }
-        std::cout << "---------------------\n";
+        std::cout << endl << endl;
     }
     
 }
+*/

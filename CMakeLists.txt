@@ -35,22 +35,4 @@ target_link_libraries(simulation
 )
 
 
-add_executable(systemTest
-    src/utils/Vector3.cpp
-    src/testing/systemTesting.cpp
-    src/system/Particle.cpp
-    src/system/System.cpp
-    src/physics/GravityForce.cpp
-    src/physics/VelocityVerlet.cpp
-    ${GLAD_SRC}
-)
-
-target_link_libraries(systemTest
-    ${GLFW_LIB}
-    "-framework OpenGL"
-    "-framework Cocoa"
-    "-framework IOKit"
-    "-framework CoreVideo"
-)
-
 
