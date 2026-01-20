@@ -18,7 +18,7 @@ class Renderer{
         const float visualScale = 1e-9f;
         const float radiusScale = 2e-7;
         double minSphere = 0.01;    
-        double maxSphere = 0.25;
+        double maxSphere = 2.00;
 
 
         // Sphere stuff
