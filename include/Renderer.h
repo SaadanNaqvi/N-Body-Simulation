@@ -42,7 +42,7 @@ class Renderer{
     public:
         Renderer(int width, int height);
         void run(System& system);
-        void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
+        void processInput(GLFWwindow* window, Camera& camera, float deltaTime, System& system);
         void generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices);
         void initSphere();
         void drawSphere(std::vector<Particle*>& particle, Shader& shader);

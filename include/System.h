@@ -5,6 +5,8 @@
 #include "GravityForce.h"
 #include <vector>
 #include "VelocityVerlet.h"
+#include <random>
+#include <cmath>
 
 class VelocityVerlet;
 
@@ -21,8 +23,8 @@ class System{
     public:
         System();
         System(std::vector<Particle*> particles);
-        
         void addParticle(Particle* particle);
+        void randomSpawn();
 
 
 

@@ -42,6 +42,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 }
 
 void Renderer::run(System& system){
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -58,6 +59,9 @@ void Renderer::run(System& system){
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     
+    double lastFPSTime = glfwGetTime();
+    int frameCount = 0;
+
     // Capture mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -144,7 +148,7 @@ void Renderer::run(System& system){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        processInput(window, camera, deltaTime);
+        processInput(window, camera, deltaTime, system);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -163,8 +167,21 @@ void Renderer::run(System& system){
         glDepthMask(GL_FALSE);
         drawTrails(system.getParticles(), trailShader, view, projection);
         glDepthMask(GL_TRUE);
-        system.update(86400);
+        system.update(2500);
         updateTrails(system.getParticles());
+
+        frameCount++;
+        double currentTime = glfwGetTime();
+
+        if (currentTime - lastFPSTime >= 1.0) {
+            double fps = frameCount / (currentTime - lastFPSTime);
+
+            std::string title = "N Body Simulation | FPS: " + std::to_string((int)fps);
+            glfwSetWindowTitle(window, title.c_str());
+
+            frameCount = 0;
+            lastFPSTime = currentTime;
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -173,23 +190,17 @@ void Renderer::run(System& system){
     glfwTerminate();
 }
 
-void Renderer::processInput(GLFWwindow* window, Camera& camera, float deltaTime)
+void Renderer::processInput(GLFWwindow* window, Camera& camera, float deltaTime, System& system)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
-        glfwSetWindowShouldClose(window, true);
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)  glfwSetWindowShouldClose(window, true);
     
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.processKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.processKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.processKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.processKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.processKeyboard(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.processKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) camera.processKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) camera.processKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) camera.processKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera.processKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera.processKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera.processKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) system.randomSpawn();
 }
 
 void Renderer::generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices){

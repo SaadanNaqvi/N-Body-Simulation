@@ -29,7 +29,7 @@ Particle* makePlanetCircular(
 }
 
 int main(){
-    Renderer r(1000, 1000);
+    Renderer r(1500, 1080);
 
     Particle* sun = new Particle(
         new Vector3(0, 0, 0),
