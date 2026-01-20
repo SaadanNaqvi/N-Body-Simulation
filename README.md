@@ -66,17 +66,37 @@ The simulation is based on classical Newtonian mechanics.
 
 ### Gravitational Force
 
-Each pair of particles interacts via Newton’s law of universal gravitation.
+Each pair of particles interacts via Newton’s law of universal gravitation:
+
+$$\mathbf{F}_{ij} = G \frac{m_i m_j}{\|\mathbf{r}_{ij}\|^2} \mathbf{\hat{r}}_{ij}$$
+
+Where:
+- $G$ is the gravitational constant  
+- $m_i, m_j$ are particle masses  
+- $\mathbf{r}_{ij}$ is the distance between particles  
+- $\mathbf{\hat{r}}_{ij}$ is the unit direction vector from particle i to j  
+
+The net force acting on a particle is the sum of forces from all other particles:
+
+$$\mathbf{F}_i = \sum_{j \neq i} \mathbf{F}_{ij}$$
 
 ### Equations of Motion
 
-Acceleration is computed using Newton’s second law.
+Acceleration is computed using Newton’s second law:
+
+$$\mathbf{a} = \frac{\mathbf{F}}{m}$$
 
 ### Time Integration
 
 The system is advanced in time using Velocity Verlet integration, which provides improved numerical stability over explicit Euler methods.
 
+Position Update:
 
+$$\mathbf{x}(t + \Delta t) = \mathbf{x}(t) + \mathbf{v}(t)\Delta t + \frac{1}{2}\mathbf{a}(t)\Delta t^2$$
+
+Velcotiy Update:
+
+$$\mathbf{v}(t + \Delta t) = \mathbf{v}(t) + \frac{1}{2}(\mathbf{a}(t) + \mathbf{a}(t + \Delta t))\Delta t$$
 
 ## Performance
 
