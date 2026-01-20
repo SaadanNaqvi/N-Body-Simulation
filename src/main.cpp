@@ -9,7 +9,6 @@ int main(){
     System system;
     system.addParticle(earth);
     system.addParticle(moon);
-    system.addParticle(me);
     
     
 

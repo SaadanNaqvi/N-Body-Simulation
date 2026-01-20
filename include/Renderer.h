@@ -15,8 +15,13 @@ class Renderer{
     private:
         int width;
         int height;
+        const float visualScale = 1e-9f;
+        const float radiusScale = 2e-7;
+        double minSphere = 0.01;    
+        double maxSphere = 0.25;
 
 
+        // Sphere stuff
         const double PI = 3.14159265359;
 
         unsigned int sphereVAO = 0;
@@ -24,7 +29,15 @@ class Renderer{
         unsigned int sphereEBO = 0;
         unsigned int indexCount = 0;
 
-        const float visualScale = 1e-9f;
+
+        
+
+
+        // Trail
+        std::unordered_map<Particle*, std::deque<Vector3>> trails;    
+        int maxTrailPoints = 500;
+        unsigned int trailVAO = 0;
+        unsigned int trailVBO = 0;
 
     public:
         Renderer(int width, int height);
@@ -33,6 +46,9 @@ class Renderer{
         void generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices);
         void initSphere();
         void drawSphere(std::vector<Particle*>& particle, Shader& shader);
+        void initTrails();
+        void updateTrails(std::vector<Particle*>& particles);
+        void drawTrails(std::vector<Particle*>& particles, Shader& trailShader, glm::mat4& view, glm::mat4& projection);
 };
 
 #endif

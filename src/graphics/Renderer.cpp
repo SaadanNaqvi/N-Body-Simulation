@@ -91,9 +91,44 @@ void Renderer::run(System& system){
     }
     )";
 
+    const char* trailVertexSrc = R"(
+    #version 330 core
+    layout(location = 0) in vec3 aPos;
+    layout(location = 1) in float aT; // 0..1 along trail
+
+    uniform mat4 view;
+    uniform mat4 projection;
+
+    out float t;
+
+    void main(){
+        t = aT;
+        gl_Position = projection * view * vec4(aPos, 1.0);
+    }
+    )";
+
+    const char* trailFragmentSrc = R"(
+    #version 330 core
+    in float t;
+    out vec4 FragColor;
+
+    void main(){
+        // Fade older points: t=0 old, t=1 new
+        float alpha = t;
+        FragColor = vec4(0.8, 0.8, 1.0, alpha);
+    }
+    )";
+
+
     Shader shader(vertexShaderSrc, fragmentShaderSrc);
-    
+    Shader trailShader(trailVertexSrc, trailFragmentSrc);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
     initSphere();
+    initTrails();
+    updateTrails(system.getParticles());
     
     // Create camera
     Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
@@ -121,9 +156,15 @@ void Renderer::run(System& system){
         
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        
+    
+
         drawSphere(system.getParticles(), shader);
-        system.update(3600.0);
+
+        glDepthMask(GL_FALSE);
+        drawTrails(system.getParticles(), trailShader, view, projection);
+        glDepthMask(GL_TRUE);
+        system.update(21600.0);
+        updateTrails(system.getParticles());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -225,14 +266,94 @@ void Renderer::drawSphere(std::vector<Particle*>& particles, Shader& shader) {
         model = glm::translate(
             model, 
             glm::vec3{
-                position->getX() * visualScale,
-                position->getY() * visualScale,
-                position->getZ() * visualScale
+                (float)(position->getX() * visualScale),
+                (float)(position->getY() * visualScale),
+                (float)(position->getZ() * visualScale)
             }
         );
+        double raw = particle->getRadius() * radiusScale;
+        double clamped = std::max(minSphere, std::min(maxSphere, raw));
+        model = glm::scale(model, glm::vec3((float)clamped));
         shader.setMat4("model", model);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
     
     glBindVertexArray(0);
 }
+
+
+void Renderer::initTrails() {
+    glGenVertexArrays(1, &trailVAO);
+    glGenBuffers(1, &trailVBO);
+
+    glBindVertexArray(trailVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, trailVBO);
+
+
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+}
+
+
+void Renderer::updateTrails(std::vector<Particle*>& particles) {
+    for (Particle* p : particles) {
+        Vector3* pos = p->getPosition();
+
+        Vector3 v(
+            pos->getX() * visualScale,
+            pos->getY() * visualScale,
+            pos->getZ() * visualScale
+        );
+
+        auto& dq = trails[p]; dq.push_back(v);
+
+        if (dq.size() > maxTrailPoints) dq.pop_front();
+    }
+}
+
+
+void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader, glm::mat4& view, glm::mat4& projection) {
+    trailShader.use();
+    trailShader.setMat4("view", view);
+    trailShader.setMat4("projection", projection);
+
+    glBindVertexArray(trailVAO);
+    glLineWidth(2.0f);
+
+    for (Particle* p : particles){
+        auto it = trails.find(p);
+        if (it == trails.end()) continue;
+
+        auto& dq = it->second;
+        if (dq.size() < 2) continue;
+
+        std::vector<float> data;
+        data.reserve(dq.size() * 4);
+
+        float nMinus1 = (dq.size() > 1) ? float(dq.size() - 1) : 1.0f;
+
+        for (size_t i = 0; i < dq.size(); i++) {
+            Vector3 v = dq[i];
+            float t = float(i) / nMinus1;
+
+            data.push_back((float)v.getX());
+            data.push_back((float)v.getY());
+            data.push_back((float)v.getZ());
+            data.push_back(t);
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, trailVBO);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_DYNAMIC_DRAW);
+
+        glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)dq.size());
+    }
+    glBindVertexArray(0);
+}
+
