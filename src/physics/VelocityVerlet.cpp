@@ -15,9 +15,11 @@ void VelocityVerlet::stepSimulation(double dt, System& system) {
         );
     }
 
-    auto systemForce = gravityForce.getSystemForce(particles); 
+    auto systemForce = gravityForce.getSystemForce(particles);
     system.setSystemForce(systemForce);
-    std::unordered_map<Particle*, Vector3> newNetForceOnParticles = system.getNetForceOnParticles();
+
+    auto newNetForceOnParticles = system.getForceOnEachParticle(systemForce);
+
 
 
     for(auto& particle : particles){

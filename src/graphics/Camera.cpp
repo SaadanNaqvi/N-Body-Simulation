@@ -2,8 +2,8 @@
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch){
     this->front = glm::vec3(0.0f, 0.0f, -1.0f);
-    this->movementSpeed = 5.0f;
-    this->zoom = 45.0f;
+    this->movementSpeed = 10.0f;
+    this->zoom = 60.0f;
     this->mouseSensitivity = 0.1f;
     this->position = position;
     this->worldUp = up;
@@ -17,11 +17,15 @@ glm::mat4 Camera::getViewMatrix(){
 }
 
 glm::mat4 Camera::getProjectionMatrix(float aspectRatio){
-    return glm::perspective(glm::radians(zoom), aspectRatio, 0.1f, 100.0f);
+    float nearPlane = 0.001f;
+    float farPlane  = 10000.0f;
+    return glm::perspective(glm::radians(zoom), aspectRatio, nearPlane, farPlane);
 }
 
 void Camera::processKeyboard(int direction, float deltaTime){
     float velocity = movementSpeed * deltaTime;
+    float zoomFactor = glm::clamp(zoom / 60.0f, 0.2f, 3.0f);
+    velocity *= zoomFactor;
     
     if (direction == FORWARD)
         position += front * velocity;

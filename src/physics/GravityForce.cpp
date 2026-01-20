@@ -26,7 +26,7 @@ std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> Gravit
         for(int j = i+1; j < n; j++){
             Vector3 particleForce = getForce(systemParticles[i], systemParticles[j]);
             systemForce[systemParticles[i]].push_back({systemParticles[j], particleForce});
-            systemForce[systemParticles[j]].push_back({systemParticles[i], particleForce});
+            systemForce[systemParticles[j]].push_back({systemParticles[i], particleForce * -1.0});
         }
     }
 
