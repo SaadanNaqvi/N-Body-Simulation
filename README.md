@@ -1,6 +1,6 @@
 # N-Body Simulation
 
-A real-time 3D N-body gravitational simulation written in C++ and OpenGL.
+A real time 3D N-body gravitational simulation written in C++ and OpenGL.
 
 This project simulates gravitational interactions between hundreds of particles using a physically based force model and renders them in real time with camera controls and motion trails.
 
@@ -26,10 +26,17 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 </p>
 
 <p align="center">
-  <em>n = 200 particles · FPS ≈ 60</em>
+  <em>n = 200 particles · FPS ≈ 60 · V1 · no optimisations</em>
 </p>
 
 ---
+
+
+**Configuration**
+- Force model: Newtonian gravity
+- Integration: Velocity Verlet
+- Acceleration structure: None
+- Hardware: MacBook Pro 2023 Apple M3, 8G RAM
 
 ## Controls
 
@@ -53,6 +60,24 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 
 ---
 
+## Physics Model
+
+The simulation is based on classical Newtonian mechanics.
+
+### Gravitational Force
+
+Each pair of particles interacts via Newton’s law of universal gravitation.
+
+### Equations of Motion
+
+Acceleration is computed using Newton’s second law.
+
+### Time Integration
+
+The system is advanced in time using Velocity Verlet integration, which provides improved numerical stability over explicit Euler methods.
+
+
+
 ## Performance
 
 - Handles hundreds of particles in real time
@@ -64,9 +89,11 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 ### First Time Setup
 ```bash
 cmake -S . -B build
+```
 
+### Compile and then run
+```bash
 cmake --build build
 
 ./build/simulation 
-
-```bash
+```
