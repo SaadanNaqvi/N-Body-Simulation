@@ -1,9 +1,9 @@
 #include "GravityForce.h"
 
 Vector3 GravityForce::getForce(Particle* particle1, Particle* particle2){
-    double dx = particle2->getPosition()->getX() - particle1->getPosition()->getX();
-    double dy = particle2->getPosition()->getY() - particle1->getPosition()->getY();
-    double dz = particle2->getPosition()->getZ() - particle1->getPosition()->getZ();
+    double dx = particle2->getPosition().getX() - particle1->getPosition().getX();
+    double dy = particle2->getPosition().getY() - particle1->getPosition().getY();
+    double dz = particle2->getPosition().getZ() - particle1->getPosition().getZ();
 
     double distance = (dx * dx) + (dy * dy) + (dz * dz);
     double r = sqrt(distance);

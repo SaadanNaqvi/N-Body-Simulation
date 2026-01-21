@@ -9,8 +9,8 @@ void VelocityVerlet::stepSimulation(double dt, System& system) {
     for(auto& particle : particles){
         Vector3 acceleration = netForceOnParticles[particle] / particle->getMass();
         particle->setPosition(
-            new Vector3(
-                *(particle->getPosition()) + *(particle->getVelocity()) * dt + acceleration * (0.5 * dt * dt)
+            Vector3(
+                (particle->getPosition()) + (particle->getVelocity()) * dt + acceleration * (0.5 * dt * dt)
             )
         );
     }
@@ -26,8 +26,8 @@ void VelocityVerlet::stepSimulation(double dt, System& system) {
         Vector3 aOld = netForceOnParticles[particle] / particle->getMass();
         Vector3 aNew = newNetForceOnParticles[particle] / particle->getMass();
         particle->setVelocity(
-            new Vector3(
-                *(particle->getVelocity()) + (aOld + aNew) * (0.5 * dt)
+            Vector3(
+                (particle->getVelocity()) + (aOld + aNew) * (0.5 * dt)
             )
         );
     }

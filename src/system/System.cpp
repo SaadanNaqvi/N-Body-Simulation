@@ -94,9 +94,9 @@ void System::randomSpawn() {
         double rVis = radiusBase * std::cbrt(m / 1e24);
 
         particles.push_back(new Particle(
-            new Vector3(x, y, z),
-            new Vector3(vx, vy, vz),
-            new Vector3(0, 0, 0),
+            Vector3(x, y, z),
+            Vector3(vx, vy, vz),
+            Vector3(0, 0, 0),
             m,
             rVis
         ));
@@ -111,25 +111,25 @@ void System::randomSpawn() {
             double m = p->getMass();
             totalM += m;
 
-            Vector3* x = p->getPosition();
-            Vector3* v = p->getVelocity();
+            Vector3 x = p->getPosition();
+            Vector3 v = p->getVelocity();
 
-            comPos += Vector3(x->getX(), x->getY(), x->getZ()) * m;
-            comVel += Vector3(v->getX(), v->getY(), v->getZ()) * m;
+            comPos += Vector3(x.getX(), x.getY(), x.getZ()) * m;
+            comVel += Vector3(v.getX(), v.getY(), v.getZ()) * m;
         }
 
         comPos = comPos * (1.0 / totalM);
         comVel = comVel * (1.0 / totalM);
 
         for (Particle* p : particles) {
-            Vector3* x = p->getPosition();
-            Vector3* v = p->getVelocity();
+            Vector3 x = p->getPosition();
+            Vector3 v = p->getVelocity();
 
-            Vector3 newX = Vector3(x->getX(), x->getY(), x->getZ()) - comPos;
-            Vector3 newV = Vector3(v->getX(), v->getY(), v->getZ()) - comVel;
+            Vector3 newX = Vector3(x.getX(), x.getY(), x.getZ()) - comPos;
+            Vector3 newV = Vector3(v.getX(), v.getY(), v.getZ()) - comVel;
 
-            p->setPosition(new Vector3(newX.getX(), newX.getY(), newX.getZ()));
-            p->setVelocity(new Vector3(newV.getX(), newV.getY(), newV.getZ()));
+            p->setPosition(Vector3(newX.getX(), newX.getY(), newX.getZ()));
+            p->setVelocity(Vector3(newV.getX(), newV.getY(), newV.getZ()));
         }
     }
 
@@ -149,16 +149,16 @@ void System::randomSpawn() {
         double r1 = d * (m2 / (m1 + m2));
         double r2 = d * (m1 / (m1 + m2));
 
-        a->setPosition(new Vector3(-r1, 0, 0));
-        b->setPosition(new Vector3( r2, 0, 0));
+        a->setPosition(Vector3(-r1, 0, 0));
+        b->setPosition(Vector3( r2, 0, 0));
 
         double vRel = std::sqrt(G * (m1 + m2) / d);
 
         double v1 = vRel * (m2 / (m1 + m2));
         double v2 = vRel * (m1 / (m1 + m2));
 
-        a->setVelocity(new Vector3(0, -v1, 0));
-        b->setVelocity(new Vector3(0,  v2, 0));
+        a->setVelocity(Vector3(0, -v1, 0));
+        b->setVelocity(Vector3(0,  v2, 0));
     }
 
     delete velocityVerlet;

@@ -272,14 +272,14 @@ void Renderer::initSphere(){
 void Renderer::drawSphere(std::vector<Particle*>& particles, Shader& shader) {
     glBindVertexArray(sphereVAO);
     for(auto& particle:particles){
-        Vector3* position = particle->getPosition();
+        Vector3 position = particle->getPosition();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(
             model, 
             glm::vec3{
-                (float)(position->getX() * visualScale),
-                (float)(position->getY() * visualScale),
-                (float)(position->getZ() * visualScale)
+                (float)(position.getX() * visualScale),
+                (float)(position.getY() * visualScale),
+                (float)(position.getZ() * visualScale)
             }
         );
         double raw = particle->getRadius() * radiusScale;
@@ -315,12 +315,12 @@ void Renderer::initTrails() {
 
 void Renderer::updateTrails(std::vector<Particle*>& particles) {
     for (Particle* p : particles) {
-        Vector3* pos = p->getPosition();
+        Vector3 pos = p->getPosition();
 
         Vector3 v(
-            pos->getX() * visualScale,
-            pos->getY() * visualScale,
-            pos->getZ() * visualScale
+            pos.getX() * visualScale,
+            pos.getY() * visualScale,
+            pos.getZ() * visualScale
         );
 
         auto& dq = trails[p]; dq.push_back(v);

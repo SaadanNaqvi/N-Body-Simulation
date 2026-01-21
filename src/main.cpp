@@ -4,13 +4,8 @@
 static constexpr double G  = 6.67430e-11;
 static constexpr double AU = 1.495978707e11;
 
-Particle* makePlanetCircular(
-    double r,          
-    double mass,            
-    double radius,          
-    double centralMass,    
-    double velJitter = 1.0    
-){
+Particle* makePlanetCircular( double r,double mass,double radius,double centralMass,double velJitter = 1.0)
+{
     double x = r, y = 0.0, z = 0.0;
 
     double v = std::sqrt(G * centralMass / r) * velJitter;
@@ -20,9 +15,9 @@ Particle* makePlanetCircular(
     double vz = 0.0;
 
     return new Particle(
-        new Vector3(x, y, z),
-        new Vector3(vx, vy, vz),
-        new Vector3(0, 0, 0),
+        Vector3(x, y, z),
+        Vector3(vx, vy, vz),
+        Vector3(0, 0, 0),
         mass,
         radius
     );
@@ -32,9 +27,9 @@ int main(){
     Renderer r(1500, 1080);
 
     Particle* sun = new Particle(
-        new Vector3(0, 0, 0),
-        new Vector3(0, 0, 0),
-        new Vector3(0, 0, 0),
+        Vector3(0, 0, 0),
+        Vector3(0, 0, 0),
+        Vector3(0, 0, 0),
         1.9885e30,     
         6.9634e8    
     );
@@ -61,16 +56,16 @@ int main(){
     system.addParticle(neptune);
 
     {
-        Vector3* ePos = earth->getPosition();
-        Vector3* eVel = earth->getVelocity();
+        Vector3 ePos = earth->getPosition();
+        Vector3 eVel = earth->getVelocity();
 
         const double rMoon = 384400000.0; 
         const double vMoon = std::sqrt(G * earth->getMass() / rMoon);
 
         Particle* moon = new Particle(
-            new Vector3(ePos->getX() + rMoon, ePos->getY(), ePos->getZ()),
-            new Vector3(eVel->getX(), eVel->getY() + vMoon, eVel->getZ()),
-            new Vector3(0, 0, 0),
+            Vector3(ePos.getX() + rMoon, ePos.getY(), ePos.getZ()),
+            Vector3(eVel.getX(), eVel.getY() + vMoon, eVel.getZ()),
+            Vector3(0, 0, 0),
             7.34767309e22,
             1.7374e6
         );
