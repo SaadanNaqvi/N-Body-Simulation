@@ -10,7 +10,7 @@ class System;
 
 class Integrator{
     public:
-        virtual void stepSimulation(double dt, System& system)  = 0;
+        virtual void stepSimulation(double dt, System& system, std::vector<Vector3>& netF)  = 0;
     
 };
 

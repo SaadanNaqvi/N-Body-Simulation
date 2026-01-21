@@ -12,6 +12,7 @@ class ForceModel{
     public:
         virtual Vector3 getForce(Particle* particle1, Particle* particle2) = 0;
         virtual std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> getSystemForce(std::vector<Particle*>& systemParticles) = 0;
+        virtual void accumulateNetForces(std::vector<Particle*>& ps, std::vector<Vector3>& netF) = 0;
 };
 
 

@@ -13,8 +13,7 @@ class VelocityVerlet;
 class System{
     private:
         std::vector<Particle*> particles;
-        std::unordered_map<Particle*, Vector3> netForceOnParticles;
-        std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> systemForce;
+        std::vector<Vector3> netForcesVec;
 
 
         GravityForce gravityForce;
@@ -29,15 +28,10 @@ class System{
 
 
         void update(double dt);
-        std::unordered_map<Particle*, Vector3> getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce);
 
         std::vector<Particle*>& getParticles();
-        std::unordered_map<Particle*, Vector3>& getNetForceOnParticles();
-        std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> getSystemForce();
         GravityForce& getGravityForce();
 
-
-        void setSystemForce(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> systemForce);
 
         ~System();
 

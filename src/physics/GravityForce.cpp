@@ -32,3 +32,33 @@ std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> Gravit
 
     return systemForce;
 }
+
+void GravityForce::accumulateNetForces(std::vector<Particle*>& ps, std::vector<Vector3>& netF){
+    int n = ps.size();
+
+    for(int i = 0; i < n; i++){
+        auto pi = ps[i]->getPosition();
+        double mi = ps[i]->getMass();
+
+        for (int j = i+1; j < n; j++){
+            auto pj = ps[j]->getPosition();
+            double mj = ps[j]->getMass();
+
+            double dx = pj.getX() - pi.getX();
+            double dy = pj.getY() - pi.getY();
+            double dz = pj.getZ() - pi.getZ();
+
+            double r2 = dx*dx + dy*dy + dz*dz + softening2;
+            double invR = 1.0 / std::sqrt(r2);
+            double invR3 = invR * invR * invR;
+
+            double s = G * mi * mj * invR3;
+
+            Vector3 fij(dx * s, dy * s, dz * s);
+
+            netF[i] += fij;
+            netF[j] += fij * -1.0;
+        }
+    }
+
+}

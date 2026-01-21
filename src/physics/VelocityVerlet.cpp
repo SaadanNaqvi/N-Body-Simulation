@@ -1,36 +1,33 @@
 #include "VelocityVerlet.h"
 
-void VelocityVerlet::stepSimulation(double dt, System& system) {
-    
-    auto& particles = system.getParticles();            
-    auto& netForceOnParticles = system.getNetForceOnParticles();       
-    auto& gravityForce = system.getGravityForce();             
+void VelocityVerlet::stepSimulation(double dt, System& system, std::vector<Vector3>& netF) {
+    auto& particles = system.getParticles();
+    const int n = (int)particles.size();
+    if (n == 0) return;
 
-    for(auto& particle : particles){
-        Vector3 acceleration = netForceOnParticles[particle] / particle->getMass();
-        particle->setPosition(
-            Vector3(
-                (particle->getPosition()) + (particle->getVelocity()) * dt + acceleration * (0.5 * dt * dt)
-            )
-        );
+    std::vector<Vector3> aOld(n);
+    for (int i = 0; i < n; i++){
+        aOld[i] = netF[i] / particles[i]->getMass();
     }
 
-    auto systemForce = gravityForce.getSystemForce(particles);
-    system.setSystemForce(systemForce);
+    for (int i = 0; i < n; i++){
+        Particle* p = particles[i];
+        Vector3 x = p->getPosition();
+        Vector3 v = p->getVelocity();
 
-    auto newNetForceOnParticles = system.getForceOnEachParticle(systemForce);
-
-
-
-    for(auto& particle : particles){
-        Vector3 aOld = netForceOnParticles[particle] / particle->getMass();
-        Vector3 aNew = newNetForceOnParticles[particle] / particle->getMass();
-        particle->setVelocity(
-            Vector3(
-                (particle->getVelocity()) + (aOld + aNew) * (0.5 * dt)
-            )
-        );
+        Vector3 xNew = x + v * dt + aOld[i] * (0.5 * dt * dt);
+        p->setPosition(xNew);
     }
 
-    netForceOnParticles = newNetForceOnParticles;
+    std::vector<Vector3> netFNew(n, Vector3(0,0,0));
+    system.getGravityForce().accumulateNetForces(particles, netFNew);
+
+    for (int i = 0; i < n; i++){
+        Particle* p = particles[i];
+        Vector3 v = p->getVelocity();
+        Vector3 aNew = netFNew[i] / p->getMass();
+
+        Vector3 vNew = v + (aOld[i] + aNew) * (0.5 * dt);
+        p->setVelocity(vNew);
+    }
 }

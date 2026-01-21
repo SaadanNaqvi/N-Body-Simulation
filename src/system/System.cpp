@@ -13,23 +13,13 @@ void System::addParticle(Particle* particle){
     velocityVerlet = new VelocityVerlet();
 }
 
-std::unordered_map<Particle*, Vector3> System::getForceOnEachParticle(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>>& systemForce){
-    std::unordered_map<Particle*, Vector3> netForceOnParticles;
-    for(auto& [particle, connections]: systemForce){
-        Vector3 netForce;
-        for(auto& [neighbour, force]: connections){
-            netForce += force;
-        }
-        netForceOnParticles[particle] = netForce;
-    }
-
-    return netForceOnParticles;
-}
-
 void System::update(double dt){
-    this->systemForce = gravityForce.getSystemForce(this->particles);
-    this->netForceOnParticles = getForceOnEachParticle(this->systemForce);
-    velocityVerlet->stepSimulation(dt, *this);
+    int n = particles.size();
+
+    netForcesVec.assign(n, Vector3(0,0,0));
+
+    gravityForce.accumulateNetForces(particles, netForcesVec);
+    velocityVerlet->stepSimulation(dt, *this, netForcesVec);
 }
 
 
@@ -38,35 +28,19 @@ std::vector<Particle*>& System::getParticles(){
     return this->particles;
 }
 
-std::unordered_map<Particle*, Vector3>& System::getNetForceOnParticles(){
-    return this->netForceOnParticles;
-}
-
-std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> System::getSystemForce(){
-    return this->systemForce;
-}
 
 GravityForce& System::getGravityForce(){
     return this->gravityForce;
 }
 
 
-
-
-
-void System::setSystemForce(std::unordered_map<Particle*, std::vector<std::pair<Particle*, Vector3>>> systemForce){
-    this->systemForce = systemForce;
-}
-
-void System::randomSpawn() {
+void System::randomSpawn(){
     for (Particle* p : particles) delete p;
     particles.clear();
-    systemForce.clear();
-    netForceOnParticles.clear();
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 250;      
+    const int N = 300;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e22;       
@@ -133,8 +107,6 @@ void System::randomSpawn() {
         }
     }
 
-    // --- Inject a guaranteed binary orbit (two bodies orbiting each other) ---
-    // This overwrites the first two particles so you always see a stable pair.
     if (makeBinary && particles.size() >= 2) {
         const double G = 6.67430e-11;
 

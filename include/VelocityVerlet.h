@@ -10,7 +10,7 @@ class System;
 class VelocityVerlet: public Integrator{
     private:
     public:
-        void stepSimulation(double dt, System& system) override;
+        void stepSimulation(double dt, System& system, std::vector<Vector3>& netF) override;
 };
 
 #endif
