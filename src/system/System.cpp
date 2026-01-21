@@ -59,7 +59,6 @@ void System::setSystemForce(std::unordered_map<Particle*, std::vector<std::pair<
 }
 
 void System::randomSpawn() {
-    // --- clear old particles ---
     for (Particle* p : particles) delete p;
     particles.clear();
     systemForce.clear();
@@ -67,21 +66,18 @@ void System::randomSpawn() {
 
     static std::mt19937 rng(std::random_device{}());
 
-    // ---------- tuning knobs ----------
-    const int N = 250;                 // total bodies
-    const double region = 1.5e11;      // spawn cube half-width (meters)
-    const double maxSpeed = 15000.0;   // random speed cap (m/s)
-    const double mMin = 1e22;          // kg
-    const double mMax = 5e26;          // kg
-    const double radiusBase = 5e6;     // just for rendering size (not physics)
-    const bool makeBinary = true;      // turn on/off the 2-body orbit
-    // ---------------------------------
+    const int N = 250;      
+    const double region = 1.5e11; 
+    const double maxSpeed = 15000.0; 
+    const double mMin = 1e22;       
+    const double mMax = 5e26;        
+    const double radiusBase = 5e6;    
+    const bool makeBinary = true;      
 
     std::uniform_real_distribution<double> posDist(-region, region);
     std::uniform_real_distribution<double> speedDist(-maxSpeed, maxSpeed);
     std::uniform_real_distribution<double> massDist(mMin, mMax);
 
-    // Spawn random particles
     particles.reserve(N);
 
     for (int i = 0; i < N; i++) {
@@ -95,8 +91,7 @@ void System::randomSpawn() {
 
         double m = massDist(rng);
 
-        // purely visual radius scaling (pick something that looks good)
-        double rVis = radiusBase * std::cbrt(m / 1e24); // cube-root-ish sizing
+        double rVis = radiusBase * std::cbrt(m / 1e24);
 
         particles.push_back(new Particle(
             new Vector3(x, y, z),
@@ -107,7 +102,6 @@ void System::randomSpawn() {
         ));
     }
 
-    // --- Remove center-of-mass position + velocity (important!) ---
     {
         Vector3 comPos(0,0,0);
         Vector3 comVel(0,0,0);

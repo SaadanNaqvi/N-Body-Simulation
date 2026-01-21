@@ -15,10 +15,10 @@ class Renderer{
     private:
         int width;
         int height;
-        const float visualScale = 1e-9f;
-        const float radiusScale = 2e-7;
-        double minSphere = 0.01;    
-        double maxSphere = 2.00;
+        const float visualScale = 0.5e-9f;
+        const float radiusScale = 2e-8;
+        double minSphere = 1.0;    
+        double maxSphere = 5.00;
 
 
         // Sphere stuff
