@@ -40,7 +40,7 @@ void System::randomSpawn(){
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 300;      
+    const int N = 4;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e22;       

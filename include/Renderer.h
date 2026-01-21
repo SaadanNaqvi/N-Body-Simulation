@@ -49,6 +49,7 @@ class Renderer{
         void initTrails();
         void updateTrails(std::vector<Particle*>& particles);
         void drawTrails(std::vector<Particle*>& particles, Shader& trailShader, glm::mat4& view, glm::mat4& projection);
+        void clearTrails();
 };
 
 #endif

@@ -200,7 +200,10 @@ void Renderer::processInput(GLFWwindow* window, Camera& camera, float deltaTime,
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera.processKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera.processKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera.processKeyboard(DOWN, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) system.randomSpawn();
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS){
+        clearTrails();
+        system.randomSpawn();
+    }
 }
 
 void Renderer::generateSphere(double radius, int sectors, int stackCount, std::vector<Vector3>& vertices, std::vector<unsigned int>& indices){
@@ -368,3 +371,6 @@ void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader
     glBindVertexArray(0);
 }
 
+void Renderer::clearTrails(){
+    trails.clear();
+}
