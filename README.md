@@ -26,7 +26,7 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 </p>
 
 <p align="center">
-  <em>n = 200 particles · FPS ≈ 60 · TC: O(n^2) per frame</em>
+  <em>n = 350 particles · FPS ≈ 60 · TC: O(n^2) per frame</em>
 </p>
 
 ---
