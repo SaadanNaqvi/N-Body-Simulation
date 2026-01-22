@@ -227,7 +227,7 @@ void Renderer::run(System& system){
         glDepthMask(GL_FALSE);
         drawTrails(system.getParticles(), trailShader, view, projection);
         glDepthMask(GL_TRUE);
-        system.update(86400);
+        system.update(100000);
         updateTrails(system.getParticles());
 
         frameCount++;
