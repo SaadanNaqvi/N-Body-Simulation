@@ -7,38 +7,44 @@
 #include <cmath>
 #include <algorithm>
 
-class Octree{
-    private:
-        Vector3 center;
-        double halfSize;
-        
-        double mass;
-        Vector3 com;
+class Octree
+{
+private:
+    Vector3 center;
+    double halfSize;
 
-        Particle* body;
+    double mass;
+    Vector3 com;
 
-        std::array<Octree*,8> children;
-        
-    public:
+    std::vector<Particle *> bodies;
 
-        static inline long long visits = 0;
-        static inline long long approximations = 0;
-        Octree(Vector3 center, double halfSize);
-        Octree();
+    std::array<Octree *, 8> children;
 
-        bool isLeaf(); // Checks if it has no children
+    static constexpr int BUCKET = 8;
 
-        void insert(Particle* particle);
-        void computeMass();
-        void clear();
-        Vector3 accelOn(Particle* p, double theta, double G, double eps);
+public:
+    static inline long long visits = 0;
+    static inline long long approximations = 0;
 
-        int childIndex(const Vector3& pos);
-        Vector3 childCenter(int index);
-        void subdivide();
+    Octree(Vector3 center, double halfSize);
+    Octree();
 
-        ~Octree();
+    bool isLeaf() const;
+    void clear();
+
+    void insert(Particle *p);
+    Vector3 accelOn(Particle *p, double theta, double G, double eps) const;
+
+private:
+    int childIndex(const Vector3 &pos) const;
+    Vector3 childCenter(int index) const;
+    void subdivide();
+    void pushBodyToChild(Particle *p);
+
+    Vector3 accelDirectLeaf(Particle *p, double G, double eps) const;
+
+public:
+    ~Octree();
 };
-
 
 #endif

@@ -64,7 +64,6 @@ void System::update(double dt){
 
     Octree tree(sceneCenter, sceneHalfSize);
     for (auto* p : particles) tree.insert(p);
-    tree.computeMass();
 
     for (int i = 0; i < n; i++){
         Vector3 acc = tree.accelOn(particles[i], theta, G, eps);
@@ -91,7 +90,7 @@ void System::randomSpawn(){
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 1000;      
+    const int N = 2000;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e20;       
