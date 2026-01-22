@@ -5,6 +5,7 @@
 #include "GravityForce.h"
 #include <vector>
 #include "VelocityVerlet.h"
+#include "Octree.h"
 #include <random>
 #include <cmath>
 

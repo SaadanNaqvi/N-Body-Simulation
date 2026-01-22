@@ -18,7 +18,11 @@ class Octree{
         Particle* body;
 
         std::array<Octree*,8> children;
+        
     public:
+
+        static inline long long visits = 0;
+        static inline long long approximations = 0;
         Octree(Vector3 center, double halfSize);
         Octree();
 
@@ -27,10 +31,10 @@ class Octree{
         void insert(Particle* particle);
         void computeMass();
         void clear();
-        Vector3 accelOn(const Particle* p, double theta, double G, double eps);
+        Vector3 accelOn(Particle* p, double theta, double G, double eps);
 
         int childIndex(const Vector3& pos);
-        Vector3 childCenter(int idx);
+        Vector3 childCenter(int index);
         void subdivide();
 
         ~Octree();

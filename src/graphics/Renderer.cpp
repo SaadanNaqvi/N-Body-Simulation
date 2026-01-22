@@ -220,10 +220,10 @@ void Renderer::run(System& system){
         drawSphere(system.getParticles(), shader);
 
         glDepthMask(GL_FALSE);
-        drawTrails(system.getParticles(), trailShader, view, projection);
+        //drawTrails(system.getParticles(), trailShader, view, projection);
         glDepthMask(GL_TRUE);
         system.update(10000);
-        updateTrails(system.getParticles());
+        //updateTrails(system.getParticles());
 
         frameCount++;
         double currentTime = glfwGetTime();
@@ -236,6 +236,8 @@ void Renderer::run(System& system){
 
             frameCount = 0;
             lastFPSTime = currentTime;
+
+            // std::cout << Octree::visits << " " << Octree::approximations << std::endl;
         }
 
         glfwSwapBuffers(window);

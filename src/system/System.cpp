@@ -3,6 +3,42 @@
 System::System(){}
 
 
+
+static void computeSceneBounds(const std::vector<Particle*>& ps, Vector3& center, double& halfSize){
+    if (ps.empty()){
+        center = Vector3(0,0,0);
+        halfSize = 1.0;
+        return;
+    }
+
+    double minX =  1e300, minY =  1e300, minZ =  1e300;
+    double maxX = -1e300, maxY = -1e300, maxZ = -1e300;
+
+    for (auto* p : ps){
+        Vector3 x = p->getPosition();
+        minX = std::min(minX, x.getX()); maxX = std::max(maxX, x.getX());
+        minY = std::min(minY, x.getY()); maxY = std::max(maxY, x.getY());
+        minZ = std::min(minZ, x.getZ()); maxZ = std::max(maxZ, x.getZ());
+    }
+
+    center = Vector3(
+        0.5*(minX + maxX),
+        0.5*(minY + maxY),
+        0.5*(minZ + maxZ)
+    );
+
+    double spanX = maxX - minX;
+    double spanY = maxY - minY;
+    double spanZ = maxZ - minZ;
+
+    double span = std::max({spanX, spanY, spanZ});
+    halfSize = 0.5 * span;
+   
+    halfSize = std::max(halfSize * 1.25, 1.0);  // padding so that the bodies on the edge still fit
+}
+
+
+
 System::System(std::vector<Particle*> particles){
     this->particles = particles;
     velocityVerlet = new VelocityVerlet();
@@ -17,8 +53,23 @@ void System::update(double dt){
     int n = particles.size();
 
     netForcesVec.assign(n, Vector3(0,0,0));
+    double theta = 1.2;
+    double G = 6.67430e-11;
+    double eps   = 1e9; 
 
-    gravityForce.accumulateNetForces(particles, netForcesVec);
+    Vector3 sceneCenter;
+    double sceneHalfSize;
+
+    computeSceneBounds(particles, sceneCenter, sceneHalfSize);
+
+    Octree tree(sceneCenter, sceneHalfSize);
+    for (auto* p : particles) tree.insert(p);
+    tree.computeMass();
+
+    for (int i = 0; i < n; i++){
+        Vector3 acc = tree.accelOn(particles[i], theta, G, eps);
+        netForcesVec[i] = acc * particles[i]->getMass();
+    }
     velocityVerlet->stepSimulation(dt, *this, netForcesVec);
 }
 
@@ -40,7 +91,7 @@ void System::randomSpawn(){
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 350;      
+    const int N = 1000;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e20;       
