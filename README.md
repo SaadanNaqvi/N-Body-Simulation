@@ -1,10 +1,8 @@
 # N-Body Simulation
 
-A real time 3D N-body gravitational simulation written in C++ and OpenGL.
+A real-time 3D N-body gravitational simulation written in C++ and OpenGL.
 
-This project simulates gravitational interactions between hundreds of particles using a physically based force model and renders them in real time with camera controls and motion trails.
-
-The simulation supports dynamic spawning, interactive camera movement, and real-time performance tracking (FPS).
+This project simulates gravitational interactions between hundreds to thousands of particles using a physically based force model and renders them in real time with interactive camera controls. The focus of the project is both numerical stability and algorithmic performance, progressing from a naïve O(nlogn) solver to an optimized O(nlogn) Barnes Hut implementation.
 
 ---
 
@@ -15,18 +13,30 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 - Real time 3D rendering using OpenGL
 - Motion trails to visualize trajectories
 - Free-fly camera with mouse + keyboard controls
-- Random system respawn at runtime
+- Dynamic system respawning at runtime
+- Barnes Hut octree acceleration structure (this took me way too long to implement)
 
 ---
 
 ## Benchmarking
 
+### Bruteforce
 <p align="center">
   <img src="media/n=200 FIRST.gif" alt="N-body simulation n=200" width="700"/>
 </p>
 
 <p align="center">
-  <em>n = 350 particles · FPS ≈ 60 · TC: O(n^2) per frame</em>
+  <em>n = 350 particles · FPS ≈ 50 · TC: O(n^2) per frame</em>
+</p>
+
+
+### Barnes Hut Optimised Solver
+<p align="center">
+  <img src="media/n=2000 Second No Trail.gif" alt="N-body simulation n=2000" width="700"/>
+</p>
+
+<p align="center">
+  <em>n = 2000 particles · FPS ≈ 50 · TC: O(n*log(n)) per frame · Barnes Hut Algorithm</em>
 </p>
 
 ---
@@ -35,8 +45,8 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 **Configuration**
 - Force model: Newtonian gravity
 - Integration: Velocity Verlet
-- Acceleration structure: None
-- Hardware: MacBook Pro 2023 Apple M3, 8G RAM
+- Acceleration structure: Barnes Hut Octree
+- Hardware: MacBook Pro 2023 (Apple M3, 8 GB RAM)
 
 ## Controls
 
@@ -57,6 +67,7 @@ The simulation supports dynamic spawning, interactive camera movement, and real-
 - Gravitational forces are computed pairwise using Newton’s law of gravitation
 - Net forces are integrated using Velocity Verlet
 - Positions are scaled for visualization while preserving physical realism
+- For large systems, distant particle clusters are approximated using their center of mass via a Barnes Hut octree
 
 ---
 
@@ -100,7 +111,8 @@ $$\mathbf{v}(t + \Delta t) = \mathbf{v}(t) + \frac{1}{2}(\mathbf{a}(t) + \mathbf
 
 ## Performance
 
-- Handles hundreds of particles in real time
+- Real-time simulation for thousands of particles using Barnes Hut
+- Performance scales approximately as O(nlogn) for large systems
 
 ---
 

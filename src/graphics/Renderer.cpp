@@ -220,10 +220,10 @@ void Renderer::run(System& system){
         drawSphere(system.getParticles(), shader);
 
         glDepthMask(GL_FALSE);
-        //drawTrails(system.getParticles(), trailShader, view, projection);
+        drawTrails(system.getParticles(), trailShader, view, projection);
         glDepthMask(GL_TRUE);
         system.update(8000);
-        //updateTrails(system.getParticles());
+        updateTrails(system.getParticles());
 
         frameCount++;
         double currentTime = glfwGetTime();
