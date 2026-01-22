@@ -43,9 +43,9 @@ void System::randomSpawn(){
     const int N = 350;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
-    const double mMin = 1e22;       
-    const double mMax = 5e26;        
-    const double radiusBase = 5e6;    
+    const double mMin = 1e20;       
+    const double mMax = 5e28;        
+    const double radiusBase = 5e3;    
     const bool makeBinary = true;      
 
     std::uniform_real_distribution<double> posDist(-region, region);

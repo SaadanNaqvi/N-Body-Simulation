@@ -1,16 +1,6 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 
-
-#define TopLeftFront 0
-#define TopRightFront 1
-#define BottomRightFront 2
-#define BottomLeftFront 3
-#define TopLeftBottom 4
-#define TopRightBottom 5
-#define BottomRightBack 6
-#define BottomLeftBack 7
-
 #include "Particle.h"
 #include <array>
 #include <vector>

@@ -1,7 +1,5 @@
 #include "Renderer.h"
 
-
-
 static glm::vec3 colorFromMass(double m, double mn, double mx){
     double denom = (mx > mn) ? (mx - mn) : 1.0;
     float t = (float)((m - mn) / denom);
@@ -11,9 +9,6 @@ static glm::vec3 colorFromMass(double m, double mn, double mx){
 
     return (1.0f - t) * c1 + t * c2;
 }
-
-
-
 
 
 float lastX = 400, lastY = 300;
@@ -227,7 +222,7 @@ void Renderer::run(System& system){
         glDepthMask(GL_FALSE);
         drawTrails(system.getParticles(), trailShader, view, projection);
         glDepthMask(GL_TRUE);
-        system.update(100000);
+        system.update(10000);
         updateTrails(system.getParticles());
 
         frameCount++;
