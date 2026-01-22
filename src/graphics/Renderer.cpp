@@ -1,6 +1,21 @@
 #include "Renderer.h"
 
 
+
+static glm::vec3 colorFromMass(double m, double mn, double mx){
+    double denom = (mx > mn) ? (mx - mn) : 1.0;
+    float t = (float)((m - mn) / denom);
+
+    glm::vec3 c1(0.4f, 0.6f, 1.0f);
+    glm::vec3 c2(1.0f, 0.9f, 0.6f);
+
+    return (1.0f - t) * c1 + t * c2;
+}
+
+
+
+
+
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
 Camera* globalCamera = nullptr;
@@ -90,8 +105,11 @@ void Renderer::run(System& system){
     const char* fragmentShaderSrc = R"(
     #version 330 core
     out vec4 FragColor;
+
+    uniform vec3 uColor;
+
     void main() {
-        FragColor = vec4(0.8, 0.8, 1.0, 1.0);
+        FragColor = vec4(uColor, 1.0);
     }
     )";
 
@@ -116,12 +134,48 @@ void Renderer::run(System& system){
     in float t;
     out vec4 FragColor;
 
+    uniform vec3 uTrailColor;
+
     void main(){
-        // Fade older points: t=0 old, t=1 new
         float alpha = t;
-        FragColor = vec4(0.8, 0.8, 1.0, alpha);
+        FragColor = vec4(uTrailColor, alpha);
     }
     )";
+
+
+    const char* bgVS = R"(
+    #version 330 core
+    const vec2 verts[3] = vec2[3](
+        vec2(-1.0, -1.0),
+        vec2( 3.0, -1.0),
+        vec2(-1.0,  3.0)
+    );
+    out vec2 uv;
+    void main(){
+        gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0);
+        uv = (gl_Position.xy * 0.5) + 0.5;
+    }
+    )";
+
+    const char* bgFS = R"(
+    #version 330 core
+    in vec2 uv;
+    out vec4 FragColor;
+
+    void main(){
+        // vertical gradient + subtle vignette
+        vec3 top = vec3(0.02, 0.02, 0.06);
+        vec3 bot = vec3(0.00, 0.00, 0.02);
+        vec3 col = mix(bot, top, uv.y);
+
+        float v = smoothstep(0.9, 0.2, length(uv - vec2(0.5)));
+        col *= v;
+
+        FragColor = vec4(col, 1.0);
+    }
+    )";
+
+
 
 
     Shader shader(vertexShaderSrc, fragmentShaderSrc);
@@ -141,7 +195,7 @@ void Renderer::run(System& system){
     // Timing
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-
+    Shader bgShader(bgVS, bgFS);
     // Render loop
     while(!glfwWindowShouldClose(window)){
         float currentFrame = glfwGetTime();
@@ -151,6 +205,12 @@ void Renderer::run(System& system){
         processInput(window, camera, deltaTime, system);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        glDisable(GL_DEPTH_TEST);
+        bgShader.use();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glEnable(GL_DEPTH_TEST);
 
         shader.use();
         
@@ -274,26 +334,44 @@ void Renderer::initSphere(){
 
 void Renderer::drawSphere(std::vector<Particle*>& particles, Shader& shader) {
     glBindVertexArray(sphereVAO);
-    for(auto& particle:particles){
+
+    double mn = 1e300, mx = 0;
+    for (auto* p : particles){
+        mn = std::min(mn, p->getMass());
+        mx = std::max(mx, p->getMass());
+    }
+    double denom = (mx > mn) ? (mx - mn) : 1.0;
+
+    for (auto* particle : particles) {
         Vector3 position = particle->getPosition();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(
-            model, 
-            glm::vec3{
-                (float)(position.getX() * visualScale),
-                (float)(position.getY() * visualScale),
-                (float)(position.getZ() * visualScale)
-            }
-        );
+
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(
+            (float)(position.getX() * visualScale),
+            (float)(position.getY() * visualScale),
+            (float)(position.getZ() * visualScale)
+        ));
+
         double raw = particle->getRadius() * radiusScale;
         double clamped = std::max(minSphere, std::min(maxSphere, raw));
         model = glm::scale(model, glm::vec3((float)clamped));
         shader.setMat4("model", model);
+
+        // map mass -> 0..1
+        float t = (float)((particle->getMass() - mn) / denom);
+
+        glm::vec3 c1(0.4f, 0.6f, 1.0f);
+        glm::vec3 c2(1.0f, 0.9f, 0.6f);
+        glm::vec3 color = (1.0f - t) * c1 + t * c2;
+
+        shader.setVec3("uColor", color);
+
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
-    
+
     glBindVertexArray(0);
 }
+
 
 
 void Renderer::initTrails() {
@@ -333,10 +411,16 @@ void Renderer::updateTrails(std::vector<Particle*>& particles) {
 }
 
 
-void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader, glm::mat4& view, glm::mat4& projection) {
+void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader,glm::mat4& view, glm::mat4& projection){
     trailShader.use();
     trailShader.setMat4("view", view);
     trailShader.setMat4("projection", projection);
+
+    double mn = 1e300, mx = 0.0;
+    for (auto* p : particles){
+        mn = std::min(mn, p->getMass());
+        mx = std::max(mx, p->getMass());
+    }
 
     glBindVertexArray(trailVAO);
     glLineWidth(2.0f);
@@ -347,6 +431,9 @@ void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader
 
         auto& dq = it->second;
         if (dq.size() < 2) continue;
+
+        glm::vec3 c = colorFromMass(p->getMass(), mn, mx);
+        trailShader.setVec3("uTrailColor", c);
 
         std::vector<float> data;
         data.reserve(dq.size() * 4);
@@ -366,10 +453,13 @@ void Renderer::drawTrails(std::vector<Particle*>& particles, Shader& trailShader
         glBindBuffer(GL_ARRAY_BUFFER, trailVBO);
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_DYNAMIC_DRAW);
 
+
         glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)dq.size());
     }
+
     glBindVertexArray(0);
 }
+
 
 void Renderer::clearTrails(){
     trails.clear();
