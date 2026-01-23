@@ -98,7 +98,7 @@ Vector3 Octree::accelDirectLeaf(Particle* p, double G, double eps) const {
 }
 
 Vector3 Octree::accelOn(Particle* p, double theta, double G, double eps) const {
-    Octree::visits++;
+    //Octree::visits++;
 
     if (!p) return Vector3(0,0,0);
     if (mass <= 0.0) return Vector3(0,0,0);
@@ -108,7 +108,8 @@ Vector3 Octree::accelOn(Particle* p, double theta, double G, double eps) const {
     const double dy = com.getY() - pos.getY();
     const double dz = com.getZ() - pos.getZ();
 
-    const double r2 = dx*dx + dy*dy + dz*dz + eps*eps;
+    double r2_geom = dx*dx + dy*dy + dz*dz;  
+    double r2_soft = r2_geom + eps*eps;     
 
     if (isLeaf()) {
         return accelDirectLeaf(p, G, eps);
@@ -119,9 +120,9 @@ Vector3 Octree::accelOn(Particle* p, double theta, double G, double eps) const {
     const double s2 = s * s;
     const double theta2 = theta * theta;
 
-    if (s2 < theta2 * r2) {
-        Octree::approximations++;
-        const double invR = 1.0 / std::sqrt(r2);
+    if (s2 < theta2 * r2_geom) {
+        //Octree::approximations++;
+        const double invR = 1.0 / std::sqrt(r2_soft);
         const double invR3 = invR * invR * invR;
         const double a = G * mass * invR3;
         return Vector3(dx * a, dy * a, dz * a);

@@ -23,6 +23,24 @@ Particle* makePlanetCircular( double r,double mass,double radius,double centralM
     );
 }
 
+Particle* makePlanetEllipsePerihelion(double a, double e,
+                                      double mass, double radius,
+                                      double centralMass)
+{
+    const double mu = G * centralMass;
+    const double r  = a * (1.0 - e);                  
+    const double v  = std::sqrt(mu * (1.0 + e) / (a * (1.0 - e)));
+
+    return new Particle(
+        Vector3(r, 0.0, 0.0),        
+        Vector3(0.0, v,   0.0),     
+        Vector3(0,0,0),
+        mass,
+        radius
+    );
+}
+
+
 int main(){
     Renderer r(1500, 1080);
 
@@ -37,14 +55,14 @@ int main(){
     System system;
     system.addParticle(sun);
 
-    Particle* mercury = makePlanetCircular(0.387 * AU, 3.3011e23, 2.4397e6, sun->getMass());
-    Particle* venus   = makePlanetCircular(0.723 * AU, 4.8675e24, 6.0518e6, sun->getMass());
-    Particle* earth   = makePlanetCircular(1.000 * AU, 5.9720e24, 6.3710e6, sun->getMass());
-    Particle* mars    = makePlanetCircular(1.524 * AU, 6.4171e23, 3.3895e6, sun->getMass());
-    Particle* jupiter = makePlanetCircular(5.203 * AU, 1.8982e27, 6.9911e7, sun->getMass());
-    Particle* saturn  = makePlanetCircular(9.537 * AU, 5.6834e26, 5.8232e7, sun->getMass());
-    Particle* uranus  = makePlanetCircular(19.191* AU, 8.6810e25, 2.5362e7, sun->getMass());
-    Particle* neptune = makePlanetCircular(30.070* AU, 1.0241e26, 2.4622e7, sun->getMass());
+    Particle* mercury = makePlanetEllipsePerihelion(0.387 * AU, 0.0167, 3.3011e23, 2.4397e6, sun->getMass());
+    Particle* venus   = makePlanetEllipsePerihelion(0.723 * AU, 0.0167, 4.8675e24, 6.0518e6, sun->getMass());
+    Particle* earth   = makePlanetEllipsePerihelion(1.000 * AU, 0.0167, 5.9720e24, 6.3710e6, sun->getMass());
+    Particle* mars    = makePlanetEllipsePerihelion(1.524 * AU, 0.0167, 6.4171e23, 3.3895e6, sun->getMass());
+    Particle* jupiter = makePlanetEllipsePerihelion(5.203 * AU, 0.0167, 1.8982e27, 6.9911e7, sun->getMass());
+    Particle* saturn  = makePlanetEllipsePerihelion(9.537 * AU, 0.0167, 5.6834e26, 5.8232e7, sun->getMass());
+    Particle* uranus  = makePlanetEllipsePerihelion(19.191* AU, 0.0167, 8.6810e25, 2.5362e7, sun->getMass());
+    Particle* neptune = makePlanetEllipsePerihelion(30.070* AU, 0.0167, 1.0241e26, 2.4622e7, sun->getMass());
 
     system.addParticle(mercury);
     system.addParticle(venus);

@@ -1,72 +1,85 @@
-    #include "ForceWorker.h"
+#include "ForceWorker.h"
+#include <algorithm>
 
-    ForceWorker::ForceWorker(){
-        worker = std::thread(&ForceWorker::threadMain, this);
+static int defaultThreads(){
+    unsigned hc = std::thread::hardware_concurrency();
+    if (hc == 0) hc = 4;
+    return (int)hc;
+}
+
+ForceWorker::ForceWorker(int numThreads) {
+    T = (numThreads <= 0) ? defaultThreads() : numThreads;
+    T = std::max(1, T);
+    bg = std::max(0, T - 1);
+
+    threads.reserve(bg);
+    for (int i = 0; i < bg; i++) {
+        threads.emplace_back(&ForceWorker::workerLoop, this);
+    }
+}
+
+void ForceWorker::parallelFor(int begin, int end, const std::function<void(int)>& fn){
+    if (end <= begin) return;
+
+    {
+        std::lock_guard<std::mutex> lock(m);
+        jobBegin = begin;
+        jobEnd   = end;
+        jobFn    = fn;
+
+        nextIndex.store(begin, std::memory_order_relaxed);
+
+        remaining = bg;     // number of background threads that must finish
+        jobGen++;       
     }
 
-    void ForceWorker::startJob(Octree* tree, std::vector<Particle*>* particles, std::vector<Vector3>* outAcc, int begin, int end, double theta, double G, double eps){
-        std::lock_guard<std::mutex> lock(forceMutex);
-        this->tree = tree;
-        this->particles = particles;
-        this->outAcc = outAcc;
-        this->begin = begin;
-        this->end = end;
-        this->theta = theta;
-        this->G = G;
-        this->eps = eps;
+    cvStart.notify_all();
 
-        done = false;
-        hasJob = true;
-
-        cv.notify_one();
+    while (true){
+        int i = nextIndex.fetch_add(1, std::memory_order_relaxed);
+        if (i >= end) break;
+        fn(i);
     }
 
-    void ForceWorker::wait(){
-        std::unique_lock<std::mutex> lock(forceMutex);
-        cv.wait(lock, [&]{
-            return done;
-        });
-    }
+    // wait for background workers
+    std::unique_lock<std::mutex> lock(m);
+    cvDone.wait(lock, [&] { return remaining == 0; });
+}
 
-    void ForceWorker::threadMain(){
-        std::unique_lock<std::mutex> lock(forceMutex);
+void ForceWorker::workerLoop(){
+    int localGen = 0;
 
-        while(true){
-            cv.wait(lock, [&]{
-                return hasJob;
-            });
+    std::unique_lock<std::mutex> lock(m);
+    while (true) {
+        cvStart.wait(lock, [&] { return quit || jobGen != localGen; });
+        if (quit) break;
 
-            if(quit) break;
-            const Octree* t = tree;
-            const auto* ps = particles;
-            auto* acc = outAcc;
-            int L = begin;
-            int R = end;
-            double th = theta;
-            double g = G;
-            double e = eps;
+        localGen = jobGen;
+        int end = jobEnd;
+        auto fn = jobFn;
 
-            hasJob = false;
-            lock.unlock();
+        lock.unlock();
 
-            // The main worker its meant to do
-            for (int i = L; i < R; i++){
-                (*acc)[i] = t->accelOn((*ps)[i], th, g, e);
-            }
-            lock.lock();
-            done = true;
-            cv.notify_one();
+        while (true) {
+            int i = nextIndex.fetch_add(1, std::memory_order_relaxed);
+            if (i >= end) break;
+            fn(i);
+        }
+
+        lock.lock();
+
+        remaining--;
+        if (remaining == 0) {
+            cvDone.notify_one();
         }
     }
+}
 
-
-
-    ForceWorker::~ForceWorker(){
-        {
-            std::lock_guard<std::mutex> lock(forceMutex);
-            quit=true;
-            hasJob = true;
-        }
-        cv.notify_one();
-        worker.join();
+ForceWorker::~ForceWorker(){
+    {
+        std::lock_guard<std::mutex> lock(m);
+        quit = true;
     }
+    cvStart.notify_all();
+    for (auto& t : threads) t.join();
+}

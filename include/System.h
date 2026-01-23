@@ -9,6 +9,8 @@
 #include "Octree.h"
 #include <random>
 #include <cmath>
+#include <chrono>
+#include <iostream>
 
 class VelocityVerlet;
 
@@ -38,6 +40,7 @@ class System{
         std::vector<Particle*>& getParticles();
         GravityForce& getGravityForce();
 
+        void computeAccelerationsBH(std::vector<Vector3>& outAcc,double theta, double G, double eps);
 
         ~System();
 

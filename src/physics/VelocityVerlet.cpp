@@ -1,33 +1,27 @@
 #include "VelocityVerlet.h"
 
-void VelocityVerlet::stepSimulation(double dt, System& system, std::vector<Vector3>& netF) {
+void VelocityVerlet::stepSimulation(double dt, System& system, std::vector<Vector3>& netF, double theta, double G, double eps){
     auto& particles = system.getParticles();
-    const int n = (int)particles.size();
+    int n = (int)particles.size();
     if (n == 0) return;
 
-    std::vector<Vector3> aOld(n);
-    for (int i = 0; i < n; i++){
-        aOld[i] = netF[i] / particles[i]->getMass();
-    }
+    std::vector<Vector3> aOld(n), aNew(n);
 
-    for (int i = 0; i < n; i++){
+    worker.parallelFor(0, n, [&](int i){
+        aOld[i] = netF[i] / particles[i]->getMass();
         Particle* p = particles[i];
         Vector3 x = p->getPosition();
         Vector3 v = p->getVelocity();
-
-        Vector3 xNew = x + v * dt + aOld[i] * (0.5 * dt * dt);
-        p->setPosition(xNew);
-    }
+        p->setPosition(x + v*dt + aOld[i]*(0.5*dt*dt));
+    });
 
     std::vector<Vector3> netFNew(n, Vector3(0,0,0));
-    system.getGravityForce().accumulateNetForces(particles, netFNew);
+    system.computeAccelerationsBH(aNew, theta, G, eps);
 
-    for (int i = 0; i < n; i++){
+    worker.parallelFor(0, n, [&](int i){
         Particle* p = particles[i];
         Vector3 v = p->getVelocity();
-        Vector3 aNew = netFNew[i] / p->getMass();
-
-        Vector3 vNew = v + (aOld[i] + aNew) * (0.5 * dt);
+        Vector3 vNew = v + (aOld[i] + aNew[i])*(0.5*dt);
         p->setVelocity(vNew);
-    }
+    });
 }

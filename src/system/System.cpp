@@ -2,6 +2,16 @@
 
 System::System(){}
 
+using Clock = std::chrono::steady_clock;
+
+inline Clock::time_point now(){
+    return Clock::now();
+}
+
+inline double ms(Clock::time_point start, Clock::time_point end){
+    return std::chrono::duration<double, std::milli>(end - start).count();
+}
+
 
 
 static void computeSceneBounds(const std::vector<Particle*>& ps, Vector3& center, double& halfSize){
@@ -57,29 +67,23 @@ void System::update(double dt){
     acc.resize(n);
     std::fill(acc.begin(), acc.end(), Vector3(0,0,0));
 
-    double theta = 1.2;
+    double theta = 0.5;
     double G = 6.67430e-11;
-    double eps   = 1e9; 
+    double eps   = 1e7; 
 
     Vector3 sceneCenter;
     double sceneHalfSize;
-
     computeSceneBounds(particles, sceneCenter, sceneHalfSize);
-    
     octree.reset(sceneCenter, sceneHalfSize);
     for (auto* p : particles) octree.insert(p);
 
-    worker.startJob(&octree,&particles,&acc,mid,n,theta,G,eps);
-
-    for (int i = 0; i < mid; i++){ // main thread computes acc
+    worker.parallelFor(0, n, [&](int i){
         acc[i] = octree.accelOn(particles[i], theta, G, eps);
-    }
-
-    worker.wait();
-    for (int i = 0; i < n; i++){
         netForcesVec[i] = acc[i] * particles[i]->getMass();
-    }
-    velocityVerlet->stepSimulation(dt, *this, netForcesVec);
+    });
+
+    velocityVerlet->stepSimulation(dt, *this, netForcesVec, theta, G, eps);
+    //std::cout << "Bounds: " << ms(t0, t1) << " ms\n" << "Thread start: "<< ms(t1, t2) << " ms\n" << "Accel calc: " << ms(t2, t3) << " ms\n" << "Integrate: "  << ms(t3, t4) << " ms\n" << std::endl;
 }
 
 
@@ -95,13 +99,12 @@ GravityForce& System::getGravityForce(){
 
 
 void System::randomSpawn(){
-    worker.wait();
     for (Particle* p : particles) delete p;
     particles.clear();
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 2000;      
+    const int N = 2;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e20;       
@@ -197,6 +200,23 @@ void System::randomSpawn(){
     delete velocityVerlet;
     velocityVerlet = new VelocityVerlet();
 }
+
+
+void System::computeAccelerationsBH(std::vector<Vector3>& outAcc,double theta, double G, double eps){
+    int n = particles.size();
+    outAcc.resize(n);
+
+    Vector3 sceneCenter; double sceneHalfSize;
+    computeSceneBounds(particles, sceneCenter, sceneHalfSize);
+
+    octree.reset(sceneCenter, sceneHalfSize);
+    for (auto* p : particles) octree.insert(p);
+
+    worker.parallelFor(0, n, [&](int i){
+        outAcc[i] = octree.accelOn(particles[i], theta, G, eps);
+    });
+}
+
 
 System::~System() {
     delete velocityVerlet;
