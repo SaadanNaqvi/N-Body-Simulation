@@ -5,6 +5,7 @@
 #include "GravityForce.h"
 #include <vector>
 #include "VelocityVerlet.h"
+#include "ForceWorker.h"
 #include "Octree.h"
 #include <random>
 #include <cmath>
@@ -19,7 +20,8 @@ class System{
 
         GravityForce gravityForce;
         VelocityVerlet* velocityVerlet;
-        
+
+        ForceWorker worker;
     public:
         System();
         System(std::vector<Particle*> particles);
