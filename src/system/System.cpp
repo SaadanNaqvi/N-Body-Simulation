@@ -69,7 +69,7 @@ void System::update(double dt){
 
     double theta = 0.5;
     double G = 6.67430e-11;
-    double eps   = 1e7; 
+    double eps   = 1e5; 
 
     Vector3 sceneCenter;
     double sceneHalfSize;
@@ -104,7 +104,7 @@ void System::randomSpawn(){
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 2;      
+    const int N = 3;      
     const double region = 1.5e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e20;       
@@ -187,8 +187,8 @@ void System::randomSpawn(){
 
         a->setPosition(Vector3(-r1, 0, 0));
         b->setPosition(Vector3( r2, 0, 0));
-
-        double vRel = std::sqrt(G * (m1 + m2) / d);
+        double vEsc = std::sqrt(2.0 * G * (m1 + m2) / d);
+        double vRel = 1.2 * vEsc;
 
         double v1 = vRel * (m2 / (m1 + m2));
         double v2 = vRel * (m1 / (m1 + m2));

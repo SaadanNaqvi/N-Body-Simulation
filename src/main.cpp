@@ -55,9 +55,9 @@ int main(){
     System system;
     system.addParticle(sun);
 
-    Particle* mercury = makePlanetEllipsePerihelion(0.387 * AU, 0.0167, 3.3011e23, 2.4397e6, sun->getMass());
+    Particle* mercury = makePlanetEllipsePerihelion(0.387 * AU, 0.5, 3.3011e23, 2.4397e6, sun->getMass());
     Particle* venus   = makePlanetEllipsePerihelion(0.723 * AU, 0.0167, 4.8675e24, 6.0518e6, sun->getMass());
-    Particle* earth   = makePlanetEllipsePerihelion(1.000 * AU, 0.0167, 5.9720e24, 6.3710e6, sun->getMass());
+    Particle* earth   = makePlanetEllipsePerihelion(1.000 * AU, 0.5, 5.9720e24, 6.3710e6, sun->getMass());
     Particle* mars    = makePlanetEllipsePerihelion(1.524 * AU, 0.0167, 6.4171e23, 3.3895e6, sun->getMass());
     Particle* jupiter = makePlanetEllipsePerihelion(5.203 * AU, 0.0167, 1.8982e27, 6.9911e7, sun->getMass());
     Particle* saturn  = makePlanetEllipsePerihelion(9.537 * AU, 0.0167, 5.6834e26, 5.8232e7, sun->getMass());
