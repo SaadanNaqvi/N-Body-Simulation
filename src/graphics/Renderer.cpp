@@ -224,13 +224,13 @@ void Renderer::run(System& system){
         glDepthMask(GL_TRUE);
 
 
-        double simSpeed = 3600000.0;
-        double fixedDt= 50.0; 
+        double simSpeed = 200000.0;
+        double fixedDt= 100000.0;
         double frameDt = deltaTime; 
         frameDt = std::min(frameDt, (double)0.05); 
         double simSecondsThisFrame = simSpeed * frameDt;
         int steps = (int)std::ceil(simSecondsThisFrame / fixedDt);
-        steps = std::min(steps, 50);
+        steps = std::min(steps, 4);
         double dt = (steps > 0) ? (simSecondsThisFrame / steps) : 0.0;
         for (int k = 0; k < steps; k++) {
             system.update(dt);

@@ -60,31 +60,49 @@ void System::addParticle(Particle* particle){
 }
 
 void System::update(double dt){
-    int n = particles.size();
-    int mid = n/2;
+    const int n = particles.size();
+    if (n == 0) return;
 
-    netForcesVec.assign(n, Vector3(0,0,0));
-    acc.resize(n);
-    std::fill(acc.begin(), acc.end(), Vector3(0,0,0));
+    const double theta = 2.5;
+    const double G = 6.67430e-11;
+    const double eps = 1e5;
 
-    double theta = 0.5;
-    double G = 6.67430e-11;
-    double eps   = 1e5; 
+    if ((int)acc.size() != n) acc.assign(n, Vector3(0,0,0));
+    if ((int)netForcesVec.size() != n) netForcesVec.assign(n, Vector3(0,0,0));
 
-    Vector3 sceneCenter;
-    double sceneHalfSize;
+    Vector3 sceneCenter; double sceneHalfSize;
     computeSceneBounds(particles, sceneCenter, sceneHalfSize);
     octree.reset(sceneCenter, sceneHalfSize);
     for (auto* p : particles) octree.insert(p);
 
     worker.parallelFor(0, n, [&](int i){
         acc[i] = octree.accelOn(particles[i], theta, G, eps);
-        netForcesVec[i] = acc[i] * particles[i]->getMass();
     });
 
-    velocityVerlet->stepSimulation(dt, *this, netForcesVec, theta, G, eps);
-    //std::cout << "Bounds: " << ms(t0, t1) << " ms\n" << "Thread start: "<< ms(t1, t2) << " ms\n" << "Accel calc: " << ms(t2, t3) << " ms\n" << "Integrate: "  << ms(t3, t4) << " ms\n" << std::endl;
+    worker.parallelFor(0, n, [&](int i){
+        Particle* p = particles[i];
+        Vector3 x = p->getPosition();
+        Vector3 v = p->getVelocity();
+        p->setPosition(x + v*dt + acc[i]*(0.5*dt*dt));
+    });
+
+    computeSceneBounds(particles, sceneCenter, sceneHalfSize);
+    octree.reset(sceneCenter, sceneHalfSize);
+    for (auto* p : particles) octree.insert(p);
+
+    worker.parallelFor(0, n, [&](int i){
+        Vector3 aNew = octree.accelOn(particles[i], theta, G, eps);
+
+    
+        Particle* p = particles[i];
+        Vector3 v = p->getVelocity();
+        p->setVelocity(v + (acc[i] + aNew)*(0.5*dt));
+
+        acc[i] = aNew;
+    });
 }
+
+
 
 
 
@@ -104,8 +122,8 @@ void System::randomSpawn(){
 
     static std::mt19937 rng(std::random_device{}());
 
-    const int N = 3;      
-    const double region = 1.5e11; 
+    const int N = 10000;      
+    const double region = 8e11; 
     const double maxSpeed = 15000.0; 
     const double mMin = 1e20;       
     const double mMax = 5e28;        

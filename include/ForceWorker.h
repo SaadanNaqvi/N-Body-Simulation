@@ -30,7 +30,7 @@ class ForceWorker{
         int remaining = 0;
    
     public:
-        ForceWorker(int numThreads = 0);
+        ForceWorker(int numThreads = 4);
         ~ForceWorker();
 
         // Run fn(i) for i in [begin, end)
