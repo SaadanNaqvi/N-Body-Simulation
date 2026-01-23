@@ -69,9 +69,7 @@ void Octree::insert(Particle* p) {
     if (isLeaf()) {
         subdivide();
         for (Particle* b : bodies) pushBodyToChild(b);
-        bodies.clear();
-        bodies.shrink_to_fit();  
-        bodies.reserve(BUCKET);
+        bodies.clear(); 
     }
 
     pushBodyToChild(p);
@@ -154,4 +152,17 @@ void Octree::clear() {
 
 Octree::~Octree() {
     clear();
+}
+
+
+void Octree::reset(Vector3 c, double hs){
+    clear();
+    this->center = c;
+    this->halfSize = hs;
+
+    mass = 0.0;
+    com  = Vector3(0,0,0);
+
+    bodies.clear();
+    bodies.reserve(BUCKET);
 }

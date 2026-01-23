@@ -7,44 +7,43 @@
 #include <cmath>
 #include <algorithm>
 
-class Octree
-{
-private:
-    Vector3 center;
-    double halfSize;
+class Octree{
+    private:
+        Vector3 center;
+        double halfSize;
 
-    double mass;
-    Vector3 com;
+        double mass;
+        Vector3 com;
 
-    std::vector<Particle *> bodies;
+        std::vector<Particle *> bodies;
 
-    std::array<Octree *, 8> children;
+        std::array<Octree *, 8> children;
 
-    static constexpr int BUCKET = 8;
+        static constexpr int BUCKET = 8;
 
-public:
-    static inline long long visits = 0;
-    static inline long long approximations = 0;
+        int childIndex(const Vector3 &pos) const;
+        Vector3 childCenter(int index) const;
+        void subdivide();
+        void pushBodyToChild(Particle *p);
 
-    Octree(Vector3 center, double halfSize);
-    Octree();
+        Vector3 accelDirectLeaf(Particle *p, double G, double eps) const;
 
-    bool isLeaf() const;
-    void clear();
+    public:
+        static inline long long visits = 0;
+        static inline long long approximations = 0;
 
-    void insert(Particle *p);
-    Vector3 accelOn(Particle *p, double theta, double G, double eps) const;
+        Octree(Vector3 center, double halfSize);
+        Octree();
 
-private:
-    int childIndex(const Vector3 &pos) const;
-    Vector3 childCenter(int index) const;
-    void subdivide();
-    void pushBodyToChild(Particle *p);
+        bool isLeaf() const;
+        void clear();
 
-    Vector3 accelDirectLeaf(Particle *p, double G, double eps) const;
+        void insert(Particle *p);
+        Vector3 accelOn(Particle *p, double theta, double G, double eps) const;
+        
+        void reset(Vector3 c, double hs);
 
-public:
-    ~Octree();
+        ~Octree();   
 };
 
 #endif

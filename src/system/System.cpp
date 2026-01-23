@@ -51,8 +51,12 @@ void System::addParticle(Particle* particle){
 
 void System::update(double dt){
     int n = particles.size();
+    int mid = n/2;
 
     netForcesVec.assign(n, Vector3(0,0,0));
+    acc.resize(n);
+    std::fill(acc.begin(), acc.end(), Vector3(0,0,0));
+
     double theta = 1.2;
     double G = 6.67430e-11;
     double eps   = 1e9; 
@@ -61,13 +65,19 @@ void System::update(double dt){
     double sceneHalfSize;
 
     computeSceneBounds(particles, sceneCenter, sceneHalfSize);
+    
+    octree.reset(sceneCenter, sceneHalfSize);
+    for (auto* p : particles) octree.insert(p);
 
-    Octree tree(sceneCenter, sceneHalfSize);
-    for (auto* p : particles) tree.insert(p);
+    worker.startJob(&octree,&particles,&acc,mid,n,theta,G,eps);
 
+    for (int i = 0; i < mid; i++){ // main thread computes acc
+        acc[i] = octree.accelOn(particles[i], theta, G, eps);
+    }
+
+    worker.wait();
     for (int i = 0; i < n; i++){
-        Vector3 acc = tree.accelOn(particles[i], theta, G, eps);
-        netForcesVec[i] = acc * particles[i]->getMass();
+        netForcesVec[i] = acc[i] * particles[i]->getMass();
     }
     velocityVerlet->stepSimulation(dt, *this, netForcesVec);
 }
@@ -85,6 +95,7 @@ GravityForce& System::getGravityForce(){
 
 
 void System::randomSpawn(){
+    worker.wait();
     for (Particle* p : particles) delete p;
     particles.clear();
 

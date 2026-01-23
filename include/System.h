@@ -22,6 +22,9 @@ class System{
         VelocityVerlet* velocityVerlet;
 
         ForceWorker worker;
+        std::vector<Vector3> acc;
+
+        Octree octree;
     public:
         System();
         System(std::vector<Particle*> particles);

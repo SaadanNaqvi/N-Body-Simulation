@@ -17,7 +17,7 @@ class ForceWorker{
         std::condition_variable cv;
         
         bool hasJob = false;
-        bool done = false;
+        bool done = true;
         bool quit = false;
 
         Octree* tree = nullptr;
