@@ -15,6 +15,7 @@ This project simulates gravitational interactions between hundreds to thousands 
 - Free-fly camera with mouse + keyboard controls
 - Dynamic system respawning at runtime
 - Barnes Hut octree acceleration structure (this took me way too long to implement)
+- Multi-threaded force evaluation (CPU parallelism)
 
 ---
 
@@ -36,7 +37,17 @@ This project simulates gravitational interactions between hundreds to thousands 
 </p>
 
 <p align="center">
-  <em>n = 2000 particles · FPS ≈ 50 · TC: O(n*log(n)) per frame · Barnes Hut Algorithm</em>
+  <em>n = 2,000 particles · FPS ≈ 50 · TC: O(n*log(n)) per frame · Barnes Hut Algorithm</em>
+</p>
+
+
+### Barnes Hut Optimised Solve + Multi-Threading + Veolcity Verlet Optimisations
+<p align="center">
+  <img src="media/n=10000 Third No trail.gif" alt="N-body simulation n=10000" width="700"/>
+</p>
+
+<p align="center">
+  <em>n = 10,000 particles · FPS ≈ 50 · TC: O(n*log(n)) per frame · Barnes Hut Algorithm + Multi-Threading + Velocity Verlet Optimisations</em>
 </p>
 
 ---
@@ -46,6 +57,7 @@ This project simulates gravitational interactions between hundreds to thousands 
 - Force model: Newtonian gravity
 - Integration: Velocity Verlet
 - Acceleration structure: Barnes Hut Octree
+- Parallelism: Multi-threaded CPU force evaluation
 - Hardware: MacBook Pro 2023 (Apple M3, 8 GB RAM)
 
 ## Controls
@@ -111,8 +123,10 @@ $$\mathbf{v}(t + \Delta t) = \mathbf{v}(t) + \frac{1}{2}(\mathbf{a}(t) + \mathbf
 
 ## Performance
 
-- Real-time simulation for thousands of particles using Barnes Hut
-- Performance scales approximately as O(nlogn) for large systems
+- Brute-force solver scales as O(n²) and becomes impractical beyond a few hundred particles
+- Barnes Hut reduces force evaluation to approximately O(n log n)
+- Multi-threading further improves scalability on modern multi core CPUs
+- Rendering becomes the primary bottleneck at very large particle counts
 
 ---
 

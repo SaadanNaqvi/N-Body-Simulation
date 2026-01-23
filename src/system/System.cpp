@@ -136,7 +136,7 @@ void System::randomSpawn(){
 
     particles.reserve(N);
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++){
         double x = posDist(rng);
         double y = posDist(rng);
         double z = posDist(rng);
